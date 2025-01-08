@@ -1,0 +1,26 @@
+<resources>
+    <string name="app_name">Family Locator &amp; Tracking App</string>
+    <string name="web_client_id">6515816523-megm5vttmleeff3jgq1upaj98pd40sue.apps.googleusercontent.com</string>
+    <string name="google_maps_key">AIzaSyDQ2c_pOSOFYSjxGMwkFvCVWKjYOM9siow</string>
+
+
+
+    <!--              Splash Screen             -->
+    <string name="app_slogan">Stay Connected, Anywhere, Anytime</string>
+
+
+    <!--              Welcome Screen             -->
+    <string name="welcome_app">Welcome to Family Locator &amp; Tracking App</string>
+    <string name="lets_started">Lets Get Started</string>
+
+    <!--              Language Screen             -->
+    <string name="select_your_language">Select Your Language</string>
+
+
+    <!--              Login Screen             -->
+    <string name="continue_with_google">Sign in With Google</string>
+
+
+
+
+</resources>
