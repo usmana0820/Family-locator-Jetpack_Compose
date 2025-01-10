@@ -19,6 +19,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.auth0.trackinapp.settings.SettingsActivity
 import com.auth0.trackinapp.ui.theme.TrackinAppTheme
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -39,6 +41,7 @@ class HomeScreen : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        val groupName = intent.getStringExtra("groupName") ?: "No Group"
 
         setContent {
             TrackinAppTheme {
@@ -46,7 +49,7 @@ class HomeScreen : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = Color.White
                 ) {
-                    HomeContent(fusedLocationClient)
+                    HomeContent(fusedLocationClient, groupName, navController = rememberNavController())
                 }
             }
         }
@@ -56,7 +59,7 @@ class HomeScreen : ComponentActivity() {
 @SuppressLint("MissingPermission")
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun HomeContent(fusedLocationClient: FusedLocationProviderClient) {
+fun HomeContent(fusedLocationClient: FusedLocationProviderClient, groupName: String, navController: NavController) {
     val context = LocalContext.current
     var location by remember { mutableStateOf("Fetching your location...") }
     var latitude by remember { mutableStateOf(0.0) }
@@ -98,11 +101,11 @@ fun HomeContent(fusedLocationClient: FusedLocationProviderClient) {
     ) {
         // Top Bar with Settings Icon
         TopAppBar(
-            title = { Text("Home Screen") },
+            title = { Text("Group: $groupName") }, // Display the group name here
             actions = {
                 IconButton(onClick = {
                     // Navigate to settings screen
-                    context.startActivity(Intent(context, SettingsActivity::class.java))
+                    navController.navigate("settings_screen")
                 }) {
                     Icon(imageVector = Icons.Filled.Settings, contentDescription = "Settings")
                 }

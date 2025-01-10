@@ -1,10 +1,13 @@
 package com.auth0.trackinapp.screens
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Text
 import androidx.compose.material3.MaterialTheme
@@ -24,6 +27,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.auth0.trackinapp.R
 import com.auth0.trackinapp.ui.theme.TrackinAppTheme
 import kotlinx.coroutines.delay
@@ -33,85 +38,102 @@ class SplashScreen : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             TrackinAppTheme {
-                SplashScreenLayout()
+                SplashActivity(navController = rememberNavController())
             }
         }
     }
 }
 @Preview
 @Composable
-fun SplashScreenLayout() {
-    val context = LocalContext.current
-    val scope = rememberCoroutineScope()
+fun SplashActivity(navController: NavController) {
+    var isVisible by remember { mutableStateOf(false) }
 
-    // Launch a coroutine to navigate after a delay
-    LaunchedEffect(true) {
-        delay(3000) // Show splash screen for 3 seconds
-        // Navigate to WelcomeScreen after splash
-        val intent = Intent(context, WelcomeScreen::class.java) // Navigate to WelcomeScreen
-        context.startActivity(intent)
-        (context as? ComponentActivity)?.finish() // Close splash screen activity
+    // Show splash screen for 3 seconds
+    LaunchedEffect(Unit) {
+        isVisible = true
+        delay(3000)
+        navController.navigate("welcome_screen") {
+            popUpTo("splash_screen") { inclusive = true }
+        }
     }
 
-    // Splash screen layout
+    // Gradient background
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = Color.White
     ) {
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(26.dp),
-            verticalArrangement = Arrangement.Top, // Adjusted to make the app name appear at the top
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            // App Name in Rainbow Color at the Top
-            Text(
-                text = stringResource(id = R.string.app_name),
-                style = MaterialTheme.typography.bodyLarge.copy(
-                    fontFamily = FontFamily.SansSerif,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 30.sp,
-                    brush = Brush.linearGradient(
+                .background(
+                    Brush.verticalGradient(
                         colors = listOf(
-                         //   Color(0xFFEE1D52), // Red
-                         //   Color(0xFFFFA300), // Orange
-                            Color(0xFFFFEF00), // Yellow
                             Color(0xFF2A9D8F), // Green
                             Color(0xFF2D6DFF), // Blue
                             Color(0xFF9B2C91)  // Purple
                         )
                     )
                 ),
+            contentAlignment = Alignment.Center
+        ) {
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(40.dp) // Add padding inside the text
-                    .padding(horizontal = 15.dp) // Add horizontal margin around the text
-                    .padding(vertical = 50.dp), // Add vertical margin around the text
-                textAlign = TextAlign.Center
-            )
+                    .fillMaxSize()
+                    .padding(24.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                // Fade-in animation for logo
+                AnimatedVisibility(
+                    visible = isVisible,
+                    enter = fadeIn(animationSpec = tween(1000))
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.applogo),
+                        contentDescription = "App Logo",
+                        modifier = Modifier
+                            .size(180.dp)
+                            .padding(bottom = 16.dp),
+                        contentScale = ContentScale.Fit
+                    )
+                }
 
+                // Fade-in animation for app name
+                AnimatedVisibility(
+                    visible = isVisible,
+                    enter = fadeIn(animationSpec = tween(1500))
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.app_name),
+                        style = MaterialTheme.typography.displayMedium.copy(
+                            fontFamily = FontFamily.SansSerif,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 32.sp,
+                            color = Color.White
+                        ),
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                }
 
-            Spacer(modifier = Modifier.height(190.dp))
-
-            // App Logo
-            Image(
-                painter = painterResource(id = R.drawable.applogo), // Replace with your logo
-                contentDescription = "App Logo",
-                modifier = Modifier.size(150.dp),
-                contentScale = ContentScale.Fit
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(
-                text = stringResource(id = R.string.app_slogan),
-                style = MaterialTheme.typography.bodyLarge.copy(
-                    fontFamily = FontFamily.SansSerif,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 18.sp,
-                    color = Color.Black
-                )
-            )
+                // Fade-in animation for slogan
+                AnimatedVisibility(
+                    visible = isVisible,
+                    enter = fadeIn(animationSpec = tween(2000))
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.app_slogan),
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            fontFamily = FontFamily.SansSerif,
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 18.sp,
+                            color = Color.White,
+                            textAlign = TextAlign.Center
+                        ),
+                        modifier = Modifier.padding(horizontal = 16.dp)
+                    )
+                }
+            }
         }
     }
 }

@@ -6,6 +6,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
+
 // Set of Material typography styles to start with
 val Typography = Typography(
     bodyLarge = TextStyle(
@@ -31,4 +32,13 @@ val Typography = Typography(
         letterSpacing = 0.5.sp
     )
     */
+)
+
+// Define the custom h6 text style separately
+val h6 = TextStyle(
+    fontFamily = FontFamily.SansSerif, // You can use your custom font family here
+    fontWeight = FontWeight.Bold,
+    fontSize = 20.sp, // Customize the size of h6
+    lineHeight = 28.sp, // Adjust the line height as needed
+    letterSpacing = 0.5.sp // Adjust letter spacing as needed
 )

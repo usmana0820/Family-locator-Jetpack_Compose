@@ -57,6 +57,7 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.play.services.location)
     implementation(libs.androidx.compilercommon)
+    implementation(libs.androidx.paging.common.android)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -65,15 +66,22 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
+    implementation("androidx.compose.material:material-icons-extended:1.5.0")
+    implementation("io.coil-kt:coil-compose:2.1.0")
+
     implementation("com.google.android.gms:play-services-maps:18.0.2")
     implementation("com.google.android.gms:play-services-auth:20.7.0")
+    
+    implementation("com.google.code.gson:gson:2.10")
     implementation("com.google.maps.android:maps-compose:2.11.1")
 
-    implementation("androidx.compose.material:material-icons-extended:1.5.0")
-    implementation("io.coil-kt:coil-compose:2.0.0")
     implementation( "com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
-    implementation("com.google.code.gson:gson:2.10")
     implementation("com.squareup.okhttp3:logging-interceptor:4.10.0")
+
+    implementation("com.google.accompanist:accompanist-glide:0.15.0")
     implementation("com.google.accompanist:accompanist-permissions:0.30.1")
+    implementation("com.google.accompanist:accompanist-pager:0.24.3-alpha")
+
+
 }

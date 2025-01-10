@@ -1,6 +1,5 @@
 package com.auth0.trackinapp.settings
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -19,9 +18,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberImagePainter
 import com.auth0.trackinapp.R
-import com.auth0.trackinapp.screens.LoginScreen
 import com.auth0.trackinapp.ui.theme.TrackinAppTheme
 import com.google.firebase.auth.FirebaseAuth
 
@@ -34,17 +34,8 @@ class SettingsActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = Color.White
                 ) {
-                    SettingsScreen(
-                        onNavigateTo = { screen ->
-                            when (screen) {
-                                "Logout" -> {
-                                    FirebaseAuth.getInstance().signOut()
-                                    startActivity(Intent(this, LoginScreen::class.java))
-                                    finish()
-                                }
-                            }
-                        }
-                    )
+                    val navController = rememberNavController()
+                    SettingsActivity(navController)
                 }
             }
         }
@@ -52,7 +43,7 @@ class SettingsActivity : ComponentActivity() {
 }
 
 @Composable
-fun SettingsScreen(onNavigateTo: (String) -> Unit) {
+fun SettingsActivity(navController: NavController) {
     val user = FirebaseAuth.getInstance().currentUser
     var userName by remember { mutableStateOf("User Name") }
     var userEmail by remember { mutableStateOf("user@example.com") }
@@ -104,42 +95,47 @@ fun SettingsScreen(onNavigateTo: (String) -> Unit) {
         SettingsOption(
             icon = painterResource(id = R.drawable.applogo),//ic_account
             text = "Account Settings",
-            onClick = { onNavigateTo("AccountSettings") }
+            onClick = { navController.navigate("AccountSettings") }
         )
         SettingsOption(
             icon = painterResource(id = R.drawable.applogo),//ic_notifications
             text = "Smart Notifications",
-            onClick = { onNavigateTo("SmartNotifications") }
+            onClick = { navController.navigate("SmartNotifications") }
         )
         SettingsOption(
             icon = painterResource(id = R.drawable.applogo),//ic_group
             text = "Group Management",
-            onClick = { onNavigateTo("GroupManagement") }
+            onClick = { navController.navigate("GroupManagement") }
         )
         SettingsOption(
             icon = painterResource(id = R.drawable.applogo),//ic_location)
             text = "Location Sharing",
-            onClick = { onNavigateTo("LocationSharing") }
+            onClick = { navController.navigate("LocationSharing") }
         )
         SettingsOption(
             icon = painterResource(id = R.drawable.applogo),//ic_flight
             text = "Flight Detection",
-            onClick = { onNavigateTo("FlightDetection") }
+            onClick = { navController.navigate("FlightDetection") }
         )
         SettingsOption(
             icon = painterResource(id = R.drawable.applogo),//ic_privacy
             text = "Privacy & Security",
-            onClick = { onNavigateTo("PrivacySecurity") }
+            onClick = { navController.navigate("PrivacySecurity") }
         )
         SettingsOption(
             icon = painterResource(id = R.drawable.applogo),//ic_about
             text = "About",
-            onClick = { onNavigateTo("About") }
+            onClick = { navController.navigate("About") }
         )
         SettingsOption(
             icon = painterResource(id = R.drawable.applogo),//ic_logout
             text = "Logout",
-            onClick = { onNavigateTo("Logout") }
+            onClick = {
+                FirebaseAuth.getInstance().signOut()
+                navController.navigate("LoginScreen") {
+                    popUpTo("SettingsActivity") { inclusive = true }
+                }
+            }
         )
     }
 }
@@ -163,12 +159,4 @@ fun SettingsOption(icon: Painter, text: String, onClick: () -> Unit) {
         Text(text = text, style = MaterialTheme.typography.bodyLarge)
     }
     Divider(color = Color.LightGray, thickness = 0.5.dp)
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewSettingsScreen() {
-    TrackinAppTheme {
-        SettingsScreen(onNavigateTo = {})
-    }
 }

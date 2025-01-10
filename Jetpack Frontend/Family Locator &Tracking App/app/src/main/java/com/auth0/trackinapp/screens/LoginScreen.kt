@@ -32,6 +32,10 @@ import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.navigation.NavController
 import com.auth0.trackinapp.ApiService
 import com.auth0.trackinapp.R
 import com.auth0.trackinapp.TokenRequest
@@ -41,6 +45,8 @@ import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.ktx.auth
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import androidx.navigation.compose.rememberNavController
+
 
 class LoginScreen : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,15 +57,14 @@ class LoginScreen : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = Color.White
                 ) {
-                    Login()
+                    LoginActivity(navController = rememberNavController())
                 }
             }
         }
     }
 }
-
 @Composable
-fun Login() {
+fun LoginActivity(navController: NavController) {
     var user by remember { mutableStateOf(FirebaseAuth.getInstance().currentUser) }
     val launcher = rememberFirebaseAuthLauncher(
         onAuthComplete = { result -> user = result.user },
@@ -71,16 +76,23 @@ fun Login() {
     // Navigate to the HomeScreen if the user is logged in
     user?.let {
         LaunchedEffect(Unit) {
-            val intent = Intent(context, GroupScreen::class.java)
-            context.startActivity(intent)
-            (context as? ComponentActivity)?.finish() // Close login screen activity
-
+            navController.navigate("group_screen") // Navigate to GroupScreen using NavController
         }
     }
+
+    val gradient = Brush.linearGradient(
+        colors = listOf(
+            Color(0xFF0098C3), // Your theme color (light blue)
+            Color(0xFF004D6A)  // A darker shade of blue
+        ),
+        start = Offset(0f, 0f),
+        end = Offset(1f, 1f)
+    )
 
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(gradient) // Apply gradient background
             .padding(16.dp),
         verticalArrangement = Arrangement.Center, // Center content vertically
         horizontalAlignment = Alignment.CenterHorizontally // Center content horizontally
@@ -98,7 +110,7 @@ fun Login() {
             text = stringResource(id = R.string.app_name),
             fontWeight = FontWeight.Bold,
             fontSize = 24.sp,
-            color = Color(0xFF0070AC), // Your theme color
+            color = Color.White, // White text color for contrast on the gradient background
             modifier = Modifier.padding(bottom = 32.dp),
             fontFamily = FontFamily.SansSerif
         )
@@ -140,6 +152,7 @@ fun Login() {
         }
     }
 }
+
 
 @Composable
 fun rememberFirebaseAuthLauncher(

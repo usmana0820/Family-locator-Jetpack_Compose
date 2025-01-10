@@ -12,7 +12,7 @@ import retrofit2.Response
 interface ApiService {
 
     // Verify the token endpoint (you can modify it if required)
-    @POST("verify-token/")
+    @POST("google_token/")
     suspend fun verifyToken(@Body request: TokenRequest): Response<UserResponse>
 
     // Check if the group name already exists

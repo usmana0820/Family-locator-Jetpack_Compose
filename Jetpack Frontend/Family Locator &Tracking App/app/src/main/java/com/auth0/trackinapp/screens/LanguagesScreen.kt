@@ -1,6 +1,5 @@
 package com.auth0.trackinapp.screens
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -25,40 +24,37 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.runtime.*
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.auth0.trackinapp.ui.theme.TrackinAppTheme
-import com.auth0.trackinapp.R // Ensure R is properly imported for your resources
+import com.auth0.trackinapp.R
 
 class LanguagesScreen : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             TrackinAppTheme {
-                LanguagesScreenLayout()
+                LanguagesActivity(navController = rememberNavController())
             }
         }
     }
 }
-@Preview
+
 @Composable
-fun LanguagesScreenLayout() {
-    val context = LocalContext.current
+fun LanguagesActivity(navController: NavController) {
     var selectedLanguage by remember { mutableStateOf("") } // Tracks the selected language
 
     // Languages list (you can customize this)
     val languages = listOf("English", "Spanish", "French", "German", "Italian", "Portuguese", "Dutch", "Chinese", "Japanese", "Korean", "Nepali", "Hindi", "Urdu")
 
-
-    // Language selection button behavior
+    // Navigate to LoginScreen once a language is selected
     if (selectedLanguage.isNotEmpty()) {
         LaunchedEffect(true) {
-            val intent = Intent(context, LoginScreen::class.java)
-            context.startActivity(intent)
-            (context as? ComponentActivity)?.finish() // Close language screen activity
+            navController.navigate("login_screen") // Navigate to login screen
         }
     }
 
-    // Language screen layout
+    // Language screen layout with gradient background
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = Color.White
@@ -66,10 +62,18 @@ fun LanguagesScreenLayout() {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-        // Make the screen scrollable
+                .verticalScroll(rememberScrollState()) // Make the screen scrollable
+                .background(
+                    brush = Brush.linearGradient(
+                        colors = listOf(
+                            Color(0xFF0098C3), // Your theme color (light blue)
+                            Color(0xFF004D6A)
+
+                        )
+                    )
+                )
         ) {
-            // Rainbow Background for TrackinApp Logo and Text
+            // App Logo with Gradient Background
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -77,11 +81,8 @@ fun LanguagesScreenLayout() {
                     .background(
                         Brush.horizontalGradient(
                             listOf(
-                               // colorResource(id = R.color.app_yellow),
                                 colorResource(id = R.color.white),
-                                colorResource(id = R.color.white),
-                              //  colorResource(id = R.color.app_parrot),
-                              //  colorResource(id = R.color.app_orange)
+                                colorResource(id = R.color.white)
                             )
                         )
                     ),
@@ -92,12 +93,15 @@ fun LanguagesScreenLayout() {
                     horizontalArrangement = Arrangement.Center
                 ) {
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text(text = stringResource(id = R.string.app_name), style = MaterialTheme.typography.bodyLarge.copy(
-                        fontFamily = FontFamily.SansSerif,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 30.sp,
-                        color = colorResource(id = R.color.app_blue),
-                    ))
+                    Text(
+                        text = stringResource(id = R.string.app_name),
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            fontFamily = FontFamily.SansSerif,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 30.sp,
+                            color = colorResource(id = R.color.app_blue),
+                        )
+                    )
                 }
             }
 
@@ -109,7 +113,7 @@ fun LanguagesScreenLayout() {
                     fontFamily = FontFamily.SansSerif,
                     fontWeight = FontWeight.Bold,
                     fontSize = 20.sp,
-                    color = Color.Black
+                    color = Color.White
                 ),
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
@@ -134,7 +138,7 @@ fun LanguagesScreenLayout() {
                             .width(350.dp) // Set a fixed width for the button
                             .height(50.dp), // Set a fixed height for the button
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = colorResource(id = R.color.app_blue), // Background color
+                            containerColor = Color(0xFF0070AC),
                             contentColor = Color.White // Text color
                         )
                     ) {
