@@ -35,7 +35,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV="D:\Code Synergy Lab\Django\Tracking App\venv"
+VIRTUAL_ENV="D:\Code Synergy Lab\Mobile Application\Family locator Jetpack_Compose\Django Backend\Tracking App\venv"
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"
