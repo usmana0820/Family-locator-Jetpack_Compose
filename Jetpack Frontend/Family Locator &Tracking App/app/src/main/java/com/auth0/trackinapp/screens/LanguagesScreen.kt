@@ -50,7 +50,7 @@ fun LanguagesActivity(navController: NavController) {
     // Navigate to LoginScreen once a language is selected
     if (selectedLanguage.isNotEmpty()) {
         LaunchedEffect(true) {
-            navController.navigate("login_screen") // Navigate to login screen
+            navController.navigate("Signup") // Navigate to login screen
         }
     }
 

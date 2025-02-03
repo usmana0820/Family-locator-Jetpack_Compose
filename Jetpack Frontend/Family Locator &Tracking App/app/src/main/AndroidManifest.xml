@@ -40,7 +40,7 @@
         </activity>
 
         <activity
-            android:name=".screens.LoginScreen"
+            android:name=".auth.LoginScreen"
             android:exported="true">
         </activity>
 

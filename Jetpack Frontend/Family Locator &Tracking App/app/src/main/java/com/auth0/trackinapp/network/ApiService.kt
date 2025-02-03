@@ -1,56 +1,148 @@
-package com.auth0.trackinapp
-
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
+// ApiService.kt
+import okhttp3.ResponseBody
+import retrofit2.Call
 import retrofit2.http.Body
-import retrofit2.http.POST
+import retrofit2.http.DELETE
 import retrofit2.http.GET
-import retrofit2.http.Query
-import retrofit2.Response
+import retrofit2.http.Header
+import retrofit2.http.PATCH
+import retrofit2.http.POST
+import retrofit2.http.PUT
+import retrofit2.http.Path
 
-// Define the API interface with necessary endpoints
+
+// request and response models for each of these operations. These models will represent the data that is sent to and received from the API.
+
+                                                    //Authentication
+data class RegisterRequest( val email: String, val password: String, val confirmPassword: String,  val phoneNumber: String)
+data class ForgotPasswordRequest(val email: String)
+data class ResetPasswordRequest(val token: String, val newPassword: String, val confirmPassword: String)
+
+
+
+data class LoginRequest(val email: String, val password: String)
+
+data class LoginResponse(val refresh: String, val access: String)
+
+                                                    //GroupManagement
+// GroupRequest.kt
+data class CreateGroupRequest(val group_name: String, val max_members: Int)
+data class CreateGroupResponse(val message: String, val group_id: Int, val group_name: String, val pin: Int)
+
+data class JoinGroupRequest(val pin: Int)
+data class JoinGroupResponse(val message: String, val group_id: Int, val group_name: String)
+
+
+data class EditGroupRequest(val group_name: String?, val max_members: Int?)
+data class EditGroupResponse(val message: String, val group_name: String, val max_members: Int)
+
+data class DeleteGroupResponse(val message: String)
+//data class LeaveGroupResponse(val message: String)
+
+
+// GroupDetailsResponse.kt
+data class GroupDetailsResponse(
+  val id: Int,
+  val group_name: String,
+  val max_members: Int,
+  val current_member_count: Int,
+  val members: List<GroupMember>
+)
+
+data class GroupMember(
+  val id: Int,
+  val user: String,
+  val user_name: String,
+  val user_email: String,
+  val role: String,
+  val joined_at: String
+)
+
+
+data class GroupDetails(
+  val id: Int,
+  val group_name: String,
+  val max_members: Int,
+  val current_member_count: Int,
+  val members: List<Member>
+)
+
+data class Member(
+  val id: Int,
+  val user: String,
+  val user_name: String,
+  val user_email: String,
+  val role: String,
+  val joined_at: String
+)
+
+// Leave Group Response Model
+data class LeaveGroupResponse(val status: String, val message: String)
+
+// Update Role Request Model
+data class UpdateRoleRequest(val role: String)
+
+// Update Role Response Model
+data class UpdateRoleResponse(val status: String, val message: String)
+
 interface ApiService {
+                                                      //EndPoints
+  //Authentication
 
-    // Verify the token endpoint (you can modify it if required)
-    @POST("google_token/")
-    suspend fun verifyToken(@Body request: TokenRequest): Response<UserResponse>
+  @POST("register/")
+  fun signUp(@Body request: RegisterRequest): Call<Void>
 
-    // Check if the group name already exists
-    @GET("check-group-name/")
-    suspend fun checkGroupName(@Query("group_name") groupName: String): Response<GroupNameResponse>
+  @GET("verify-email/{token}/")
+  fun verifyEmail(@Path("token") token: String): Call<Void>
 
-    // Create a new group
-    @POST("create-group/")
-    suspend fun createGroup(@Body request: CreateGroupRequest): Response<CreateGroupResponse>
+  @POST("login/")
+  fun login(@Body loginRequest: LoginRequest): Call<LoginResponse>
 
-    // Verify the pin for joining a group
-    @POST("verify-pin/")
-    suspend fun verifyPin(@Body request: VerifyPinRequest): Response<VerifyPinResponse>
+  @POST("forgot-password/")
+  fun forgotPassword(@Body request: ForgotPasswordRequest): Call<Void>
 
-    companion object {
-        val instance: ApiService by lazy {
-            Retrofit.Builder()
-                .baseUrl("http://192.168.10.4:8000/api/") // Make sure to update the base URL
-                .addConverterFactory(GsonConverterFactory.create())
-                .build()
-                .create(ApiService::class.java)
-        }
-    }
+  @POST("reset-password/{token}/")
+  fun resetPassword(@Path("token") token: String, @Body request: ResetPasswordRequest): Call<Void>
+
+
+
+                                                  //GroupManagement
+  // Create Group
+  @POST("groups/create/")
+  fun createGroup(@Header("Authorization") token: String, @Body groupRequest: CreateGroupRequest): Call<CreateGroupResponse>
+
+  // Join Group
+  @POST("groups/join/")
+  fun joinGroup(@Header("Authorization") token: String, @Body joinRequest: JoinGroupRequest): Call<JoinGroupResponse>
+
+
+  // Get Group Details
+  @GET("api/group_details/{group_id}/")
+  fun getGroupDetails(
+    @Path("group_id") groupId: Int,
+    @Header("Authorization") token: String
+  ): Call<GroupDetailsResponse>
+
+  // Leave Group
+  @POST("groups/leave/{group_id}/")
+  fun leaveGroup(
+    @Path("group_id") groupId: Int,
+    @Header("Authorization") token: String
+  ): Call<LeaveGroupResponse>
+
+  // Update Member Role
+  @PATCH("groups/update_member_role/{group_id}/{member_id}/")
+  fun updateMemberRole(
+    @Path("group_id") groupId: Int,
+    @Path("member_id") memberId: Int,
+    @Header("Authorization") token: String,
+    @Body updateRoleRequest: UpdateRoleRequest
+  ): Call<UpdateRoleResponse>
+
+
+
+
 }
 
-// Request and response models for each API call
 
-// Token verification
-data class TokenRequest(val token: String)
-data class UserResponse(val name: String, val email: String, val message: String? = null)
 
-// Group name check
-data class GroupNameResponse(val exists: Boolean, val message: String? = null)
-
-// Group creation
-data class CreateGroupRequest(val groupName: String, val pinCode: String)
-data class CreateGroupResponse(val success: Boolean, val message: String, val pin: Int? = null)
-
-// Verify pin for joining
-data class VerifyPinRequest(val groupName: String, val pinCode: String)
-data class VerifyPinResponse(val success: Boolean, val message: String, val userId: String? = null)

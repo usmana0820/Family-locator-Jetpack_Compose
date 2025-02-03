@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Family Locator &amp; Tracking App</string>
+    <string name="app_name">Family Locator </string>
     <string name="web_client_id">6515816523-megm5vttmleeff3jgq1upaj98pd40sue.apps.googleusercontent.com</string>
     <string name="google_maps_key">AIzaSyDQ2c_pOSOFYSjxGMwkFvCVWKjYOM9siow</string>
 
@@ -19,6 +19,10 @@
 
     <!--              Login Screen             -->
     <string name="continue_with_google">Sign in With Google</string>
+
+    <!--              Login Screen             -->
+<!--    <string name="continue_with_google">Sign in With Google</string>-->
+
 
 
 

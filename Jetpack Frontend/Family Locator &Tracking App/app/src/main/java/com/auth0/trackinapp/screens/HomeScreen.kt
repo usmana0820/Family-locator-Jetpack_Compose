@@ -2,9 +2,7 @@
 
 package com.auth0.trackinapp.screens
 
-import android.Manifest
 import android.annotation.SuppressLint
-import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -13,15 +11,18 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
-import com.auth0.trackinapp.settings.SettingsActivity
 import com.auth0.trackinapp.ui.theme.TrackinAppTheme
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
@@ -32,7 +33,15 @@ import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
+import java.util.jar.Manifest
+
+
+
+
+import androidx.compose.runtime.*
+import androidx.compose.material3.IconButton
 
 
 class HomeScreen : ComponentActivity() {
@@ -49,15 +58,21 @@ class HomeScreen : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = Color.White
                 ) {
-                    HomeContent(fusedLocationClient, groupName, navController = rememberNavController())
+                    //HomeContent(fusedLocationClient, groupName, navController = rememberNavController())
+
                 }
             }
         }
     }
 }
 
+
+
+
+
+
 @SuppressLint("MissingPermission")
-@OptIn(ExperimentalPermissionsApi::class)
+@OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun HomeContent(fusedLocationClient: FusedLocationProviderClient, groupName: String, navController: NavController) {
     val context = LocalContext.current
@@ -66,9 +81,8 @@ fun HomeContent(fusedLocationClient: FusedLocationProviderClient, groupName: Str
     var longitude by remember { mutableStateOf(0.0) }
     var currentLatLng by remember { mutableStateOf(LatLng(0.0, 0.0)) }
 
-    val locationPermissionState = rememberPermissionState(permission = Manifest.permission.ACCESS_FINE_LOCATION)
-
-    // Camera position state for map zoom
+    val locationPermissionState = rememberPermissionState(android.Manifest.permission.ACCESS_FINE_LOCATION)
+        // Camera position state for map zoom
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(currentLatLng, 15f) // Default zoom level
     }
@@ -105,7 +119,7 @@ fun HomeContent(fusedLocationClient: FusedLocationProviderClient, groupName: Str
             actions = {
                 IconButton(onClick = {
                     // Navigate to settings screen
-                    navController.navigate("settings_screen")
+                    navController.navigate("SettingsScreen/{token}")
                 }) {
                     Icon(imageVector = Icons.Filled.Settings, contentDescription = "Settings")
                 }
@@ -125,7 +139,7 @@ fun HomeContent(fusedLocationClient: FusedLocationProviderClient, groupName: Str
                 ) {
                     // Add marker at the current location
                     Marker(
-                        state = com.google.maps.android.compose.MarkerState(position = currentLatLng),
+                        state = MarkerState(position = currentLatLng),
                         title = "Your Location",
                         snippet = "Latitude: $latitude, Longitude: $longitude"
                     )

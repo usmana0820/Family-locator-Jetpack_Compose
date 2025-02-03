@@ -82,6 +82,16 @@ dependencies {
     implementation("com.google.accompanist:accompanist-glide:0.15.0")
     implementation("com.google.accompanist:accompanist-permissions:0.30.1")
     implementation("com.google.accompanist:accompanist-pager:0.24.3-alpha")
+    implementation ("com.google.accompanist:accompanist-permissions:<version>")
+    implementation ("com.squareup.okio:okio:3.5.0")
+
+
+
+    // OSMDroid for OSM maps
+    implementation ("org.osmdroid:osmdroid-android:6.1.10")
+
+    // Google Location Services for user location tracking
+    implementation ("com.google.android.gms:play-services-location:18.0.0")
 
 
 }
