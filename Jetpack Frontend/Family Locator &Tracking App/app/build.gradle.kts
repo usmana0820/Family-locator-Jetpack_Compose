@@ -58,6 +58,8 @@ dependencies {
     implementation(libs.play.services.location)
     implementation(libs.androidx.compilercommon)
     implementation(libs.androidx.paging.common.android)
+    implementation(libs.androidx.benchmark.macro)
+    implementation(libs.androidx.runtime.livedata)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -92,6 +94,13 @@ dependencies {
 
     // Google Location Services for user location tracking
     implementation ("com.google.android.gms:play-services-location:18.0.0")
+
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.0")
+    implementation("com.google.accompanist:accompanist-systemuicontroller:0.30.0")
+
+    implementation ("androidx.compose.material3:material3:1.2.0")
+    implementation ("androidx.compose.foundation:foundation:1.5.0")
+
 
 
 }

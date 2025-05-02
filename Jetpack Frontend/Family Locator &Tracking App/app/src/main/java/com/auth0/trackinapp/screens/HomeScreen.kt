@@ -42,6 +42,7 @@ import java.util.jar.Manifest
 
 import androidx.compose.runtime.*
 import androidx.compose.material3.IconButton
+import com.auth0.trackinapp.SharedPrefManager
 
 
 class HomeScreen : ComponentActivity() {
@@ -51,6 +52,7 @@ class HomeScreen : ComponentActivity() {
         super.onCreate(savedInstanceState)
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         val groupName = intent.getStringExtra("groupName") ?: "No Group"
+        SharedPrefManager.init(this)
 
         setContent {
             TrackinAppTheme {
@@ -74,7 +76,7 @@ class HomeScreen : ComponentActivity() {
 @SuppressLint("MissingPermission")
 @OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun HomeContent(fusedLocationClient: FusedLocationProviderClient, groupName: String, navController: NavController) {
+fun HomeContent(fusedLocationClient: FusedLocationProviderClient, groupName: String, navController: NavController, token: String) {
     val context = LocalContext.current
     var location by remember { mutableStateOf("Fetching your location...") }
     var latitude by remember { mutableStateOf(0.0) }
@@ -118,8 +120,9 @@ fun HomeContent(fusedLocationClient: FusedLocationProviderClient, groupName: Str
             title = { Text("Group: $groupName") }, // Display the group name here
             actions = {
                 IconButton(onClick = {
-                    // Navigate to settings screen
-                    navController.navigate("SettingsScreen/{token}")
+                    val token = SharedPrefManager.getToken() ?: ""  // Get the token from SharedPreferences
+                    // Navigate to Settings screen with the token
+                    navController.navigate("SettingsScreen/$token")
                 }) {
                     Icon(imageVector = Icons.Filled.Settings, contentDescription = "Settings")
                 }
@@ -180,6 +183,27 @@ fun HomeContent(fusedLocationClient: FusedLocationProviderClient, groupName: Str
             }) {
                 Text(text = "Set Up SOS")
             }
+
+
+            // Logout button
+            Button(
+                onClick = {
+                    // Clear the token and navigate back to Login screen
+                    SharedPrefManager.clearToken() // This works now after initialization
+
+                    // Navigate to Login screen
+                    navController.navigate("LoginScreen") {
+                        // Pop all previous destinations off the stack to clear the back stack
+                        popUpTo("LoginScreen") { inclusive = true }
+                    }
+                },
+                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+            ) {
+                Text(text = "Logout", color = Color.White)
+            }
+
+
         }
     }
 }

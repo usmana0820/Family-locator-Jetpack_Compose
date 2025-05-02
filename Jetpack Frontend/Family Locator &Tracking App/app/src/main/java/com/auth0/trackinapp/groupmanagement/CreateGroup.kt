@@ -31,6 +31,7 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.util.Log
 import androidx.core.content.ContextCompat.getSystemService
+import com.auth0.trackinapp.SharedPrefManager
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -43,8 +44,9 @@ fun GroupCreationScreen(navController: NavController, token: String, groupViewMo
     var showDialog by remember { mutableStateOf(false) }
     var isMaxMembersValid by remember { mutableStateOf(true) }
 
-
     val context = LocalContext.current
+    SharedPrefManager.init(context)
+
     val blueishColor = colorResource(id = R.color.blueish)
 
     // Function to check if input is a valid number
@@ -157,11 +159,14 @@ fun GroupCreationScreen(navController: NavController, token: String, groupViewMo
                                 token,
                                 groupName.text,
                                 maxMembers.text.toInt(),
-                                onSuccess = {
-                                    generatedPin =
-                                        it.pin.toString() // Assuming 'it' contains the generated pin
+                                onSuccess = { group ->
+                                    generatedPin = group.pin.toString() // Assuming 'group' contains the generated pin
                                     successMessage = "Group created successfully"
                                     showDialog = true
+                                    // Save token after creating group
+                                    SharedPrefManager.saveToken(token)
+                                    // Navigate to Home screen
+                                    navController.navigate("home_screen/${group.group_name}/$token")
                                 },
                                 onError = {
                                     errorMessage = it
@@ -238,7 +243,7 @@ fun GroupCreationScreen(navController: NavController, token: String, groupViewMo
                     Button(
                         onClick = {
                             showDialog = false
-                            navController.navigate("home_screen/{groupName}")
+                            navController.navigate("home_screen/{groupName}/{token}")
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = blueishColor)
                     ) {

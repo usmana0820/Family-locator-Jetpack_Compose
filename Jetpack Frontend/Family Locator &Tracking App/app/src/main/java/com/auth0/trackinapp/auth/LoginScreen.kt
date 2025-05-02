@@ -22,21 +22,19 @@ import androidx.navigation.compose.rememberNavController
 import androidx.compose.animation.*
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.material3.AlertDialogDefaults.containerColor
 import androidx.compose.ui.graphics.Path
 import androidx.compose.runtime.Composable
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
-import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import com.android.tools.build.jetifier.core.utils.Log
 import com.auth0.trackinapp.R
+import com.auth0.trackinapp.SharedPrefManager
 import kotlinx.coroutines.delay
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -47,16 +45,17 @@ fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel = v
     var isLoading by remember { mutableStateOf(false) }
     var isVisible by remember { mutableStateOf(false) }
 
+    val context = LocalContext.current
+    SharedPrefManager.init(context)
+
     val blueishColor = colorResource(id = R.color.blueish)
 
-    // Smooth button animation using animateDpAsState
     val buttonOffset by animateDpAsState(
         targetValue = if (isVisible) 0.dp else 100.dp,
         animationSpec = tween(durationMillis = 800, easing = FastOutSlowInEasing),
         label = "Button Slide Animation"
     )
 
-    // LaunchedEffect to trigger animations
     LaunchedEffect(Unit) {
         delay(300)
         isVisible = true
@@ -84,7 +83,8 @@ fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel = v
                         textAlign = android.graphics.Paint.Align.CENTER
                         typeface = android.graphics.Typeface.create(android.graphics.Typeface.DEFAULT, android.graphics.Typeface.BOLD)
                     }
-                    drawText("Family Locator", size.width / 2, size.height * 0.1f, textPaint)
+                    drawText("Fmily Loctor", size.width / 2, size.height * 0.1f, textPaint)
+//                    drawText(stringResource(R.string.app_name), size.width / 2, size.height * 0.1f, textPaint)
                 }
             }
 
@@ -92,17 +92,17 @@ fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel = v
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(16.dp)
-                    .offset(y = buttonOffset), // Smooth slide animation
+                    .offset(y = buttonOffset),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 AnimatedVisibility(
                     visible = isVisible,
-                    enter = fadeIn(animationSpec = tween(600)) + slideInVertically(initialOffsetY = { -50 }),
-                    exit = fadeOut(animationSpec = tween(300))
+                    enter = fadeIn(tween(600)) + slideInVertically { -50 },
+                    exit = fadeOut(tween(300))
                 ) {
                     Text(
-                        text = "Login",
+                        text = stringResource(R.string.login_title),
                         style = MaterialTheme.typography.headlineLarge.copy(
                             color = blueishColor,
                             fontWeight = FontWeight.Bold
@@ -117,12 +117,12 @@ fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel = v
                 ) {
                     AnimatedVisibility(
                         visible = isVisible,
-                        enter = fadeIn(animationSpec = tween(500)) + slideInVertically(initialOffsetY = { 40 })
+                        enter = fadeIn(tween(500)) + slideInVertically { 40 }
                     ) {
                         TextField(
                             value = email,
                             onValueChange = { email = it },
-                            label = { Text("Email") },
+                            label = { Text(stringResource(R.string.email_label)) },
                             modifier = Modifier.fillMaxWidth(),
                             colors = TextFieldDefaults.textFieldColors(
                                 containerColor = Color.Transparent,
@@ -137,12 +137,12 @@ fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel = v
 
                     AnimatedVisibility(
                         visible = isVisible,
-                        enter = fadeIn(animationSpec = tween(500)) + slideInVertically(initialOffsetY = { 40 })
+                        enter = fadeIn(tween(500)) + slideInVertically { 40 }
                     ) {
                         TextField(
                             value = password,
                             onValueChange = { password = it },
-                            label = { Text("Password") },
+                            label = { Text(stringResource(R.string.password_label)) },
                             modifier = Modifier.fillMaxWidth(),
                             visualTransformation = PasswordVisualTransformation(),
                             colors = TextFieldDefaults.textFieldColors(
@@ -158,16 +158,16 @@ fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel = v
 
                     AnimatedVisibility(
                         visible = isVisible,
-                        enter = fadeIn(animationSpec = tween(600)) + slideInVertically(initialOffsetY = { 50 })
+                        enter = fadeIn(tween(600)) + slideInVertically { 50 }
                     ) {
                         Button(
                             onClick = {
                                 if (email.text.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email.text).matches()) {
-                                    errorMessage = "Invalid email format"
+                                    errorMessage = context.getString(R.string.invalid_email)
                                     return@Button
                                 }
                                 if (password.text.length < 6) {
-                                    errorMessage = "Password must be at least 6 characters"
+                                    errorMessage = context.getString(R.string.password_too_short)
                                     return@Button
                                 }
 
@@ -177,7 +177,15 @@ fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel = v
                                     password.text,
                                     onSuccess = { loginResponse ->
                                         isLoading = false
-                                        navController.navigate("group_management/${loginResponse.access}")
+                                        SharedPrefManager.saveToken(loginResponse.access)
+
+                                        if (SharedPrefManager.isTokenAvailable()) {
+                                            navController.navigate("home_screen/{groupName}/{token}") {
+                                                popUpTo("LoginScreen") { inclusive = true }
+                                            }
+                                        } else {
+                                            errorMessage = context.getString(R.string.auth_failed)
+                                        }
                                     },
                                     onError = {
                                         isLoading = false
@@ -185,9 +193,7 @@ fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel = v
                                     }
                                 )
                             },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(50.dp),
+                            modifier = Modifier.fillMaxWidth().height(50.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = blueishColor)
                         ) {
                             if (isLoading) {
@@ -197,7 +203,7 @@ fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel = v
                                 )
                             } else {
                                 Text(
-                                    text = "Login",
+                                    text = stringResource(R.string.login_button),
                                     color = Color.White,
                                     style = MaterialTheme.typography.bodyMedium
                                 )
@@ -209,33 +215,27 @@ fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel = v
 
                     AnimatedVisibility(
                         visible = isVisible,
-                        enter = fadeIn(animationSpec = tween(500)) + slideInVertically(initialOffsetY = { 30 })
+                        enter = fadeIn(tween(500)) + slideInVertically { 30 }
                     ) {
-                        TextButton(onClick = { navController.navigate("Register") }) {
-                            Text(
-                                text = "Don't have an account? Register",
-                                style = MaterialTheme.typography.bodyMedium.copy(color = colorResource(id = R.color.light_sea_green))
-                            )
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(1.dp))
-
-                    AnimatedVisibility(
-                        visible = isVisible,
-                        enter = fadeIn(animationSpec = tween(500)) + slideInVertically(initialOffsetY = { 30 })
-                    ) {
-                        TextButton(onClick = { navController.navigate("forgot-password") }) {
-                            Text(
-                                text = "Forgot Password?",
-                                style = MaterialTheme.typography.bodyMedium.copy(color = colorResource(id = R.color.light_sea_green))
-                            )
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            TextButton(onClick = { navController.navigate("Register") }) {
+                                Text(
+                                    text = stringResource(R.string.register_prompt),
+                                    style = MaterialTheme.typography.bodyMedium.copy(color = colorResource(id = R.color.light_sea_green))
+                                )
+                            }
+                            TextButton(onClick = { navController.navigate("forgot-password") }) {
+                                Text(
+                                    text = stringResource(R.string.forgot_password),
+                                    style = MaterialTheme.typography.bodyMedium.copy(color = colorResource(id = R.color.light_sea_green))
+                                )
+                            }
                         }
                     }
 
                     AnimatedVisibility(
                         visible = errorMessage.isNotEmpty(),
-                        enter = fadeIn(animationSpec = tween(500))
+                        enter = fadeIn(tween(500))
                     ) {
                         Text(
                             text = errorMessage,
@@ -243,55 +243,11 @@ fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel = v
                             modifier = Modifier.padding(top = 16.dp)
                         )
                     }
-
-
-
-
-                    Button(
-                        onClick = { navController.navigate("home_screen/{groupName}") },
-                        modifier = Modifier
-                            .fillMaxWidth(0.8f)
-                            .height(50.dp)
-                            //   .shadow(5.dp, shape = RoundedCornerShape(1.dp))
-                        //colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0098c3))
-                    ) {
-                        Text(text = "Home Screen", color = Color.White, fontWeight = FontWeight.Bold)
-                    }
-
-
-//
-//                    Button(
-//                        onClick = { navController.navigate("group_creation_screen/$token") },
-//                        modifier = Modifier
-//                            .fillMaxWidth(0.8f)
-//                            .height(50.dp)
-//                            //   .shadow(5.dp, shape = RoundedCornerShape(1.dp))
-//                            .offset(y = buttonOffset.dp), // Slide up animation
-//                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0098c3))
-//                    ) {
-//                        Text(text = "Create Group", color = Color.White, fontWeight = FontWeight.Bold)
-//                    }
-//
-//
-//                    Button(
-//                        onClick = { navController.navigate("group_creation_screen/$token") },
-//                        modifier = Modifier
-//                            .fillMaxWidth(0.8f)
-//                            .height(50.dp)
-//                            //   .shadow(5.dp, shape = RoundedCornerShape(1.dp))
-//                            .offset(y = buttonOffset.dp), // Slide up animation
-//                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0098c3))
-//                    ) {
-//                        Text(text = "Create Group", color = Color.White, fontWeight = FontWeight.Bold)
-//                    }
-
-
                 }
             }
         }
     }
 }
-
 
 @Composable
 @Preview(showBackground = true)
@@ -300,5 +256,3 @@ fun LoginScreenPreview() {
         LoginScreen(navController = rememberNavController())
     }
 }
-
-

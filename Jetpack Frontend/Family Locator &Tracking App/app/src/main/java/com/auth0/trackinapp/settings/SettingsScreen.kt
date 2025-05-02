@@ -1,5 +1,3 @@
-package com.auth0.trackinapp.settings
-
 import android.graphics.Paint
 import android.graphics.Typeface
 import android.os.Build
@@ -98,21 +96,6 @@ fun SettingsScreen(
             ) {
                 Spacer(modifier = Modifier.height(160.dp))
 
-                // Title with shadow effect
-//                Text(
-//                    text = "Settings",
-//                    style = MaterialTheme.typography.headlineLarge.copy(
-//                        color = Color(0xFF0098c3),
-//                        fontWeight = FontWeight.Bold,
-//                        shadow = Shadow(
-//                            color = Color.White,
-//                            offset = Offset(4f, 4f),
-//                            blurRadius = 4f
-//                        )
-//                    ),
-//                    modifier = Modifier.padding(bottom = 32.dp)
-//                )
-
                 // Settings options
                 SettingOption(
                     text = "Account Settings",
@@ -131,23 +114,10 @@ fun SettingsScreen(
                 SettingOption(
                     text = "Group Management",
                     onClick = {
-                        navController.navigate("GroupManagementScreen/$token")
+                        navController.navigate("GroupManagementSetting/$token")
                     }
                 )
 
-//                Spacer(modifier = Modifier.height(8.dp))
-//
-//                SettingOption(
-//                    text = "Location Sharing",
-//                    onClick = { /* Handle Location Sharing click */ }
-//                )
-//
-//                Spacer(modifier = Modifier.height(8.dp))
-//
-//                SettingOption(
-//                    text = "Flight Detection",
-//                    onClick = { /* Handle Flight Detection click */ }
-//                )
 
                 Spacer(modifier = Modifier.height(8.dp))
 
@@ -215,23 +185,8 @@ fun PreviewSettingsScreen() {
 }
 
 
-//
-//class SettingsActivity : ComponentActivity() {
-//    override fun onCreate(savedInstanceState: Bundle?) {
-//        super.onCreate(savedInstanceState)
-//        setContent {
-//            TrackinAppTheme {
-//                Surface(
-//                    modifier = Modifier.fillMaxSize(),
-//                    color = Color.White
-//                ) {
-//                    val navController = rememberNavController()
-//                    SettingsActivity(navController)
-//                }
-//            }
-//        }
-//    }
-//}
+
+
 //
 //@Composable
 //fun SettingsActivity(navController: NavController) {

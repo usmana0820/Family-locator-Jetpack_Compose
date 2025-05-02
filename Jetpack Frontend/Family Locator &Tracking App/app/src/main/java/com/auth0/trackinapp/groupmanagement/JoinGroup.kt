@@ -31,6 +31,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.VisualTransformation
 import com.auth0.trackinapp.R
+import com.auth0.trackinapp.SharedPrefManager
 import kotlinx.coroutines.delay
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -39,6 +40,10 @@ fun GroupJoinScreen(navController: NavController, token: String, groupViewModel:
     var successMessage by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
 
+
+    val context = LocalContext.current
+    SharedPrefManager.init(context)
+    
     val blueishColor = colorResource(id = R.color.blueish)
 
     Surface(
@@ -92,14 +97,17 @@ fun GroupJoinScreen(navController: NavController, token: String, groupViewModel:
                 )
                 Spacer(modifier = Modifier.height(16.dp))
 
+
                 Button(
                     onClick = {
-                        groupViewModel.joinGroup(
-                            token,
-                            pin.text.toInt(),
+                        groupViewModel.joinGroup(token, pin.text.toInt(),
                             onSuccess = {
-                                successMessage = "Joined group: ${it.group_name}"
-                                navController.navigate("home_screen/${it.group_name}") // Pass group name
+                                group ->
+                                successMessage = "Joined group: ${group.group_name}" // Adjusted to use group_name
+                                navController.navigate("home_screen/${group.group_name}/$token") // Pass group name
+                                // Save token after joining the group
+                                SharedPrefManager.saveToken(token)
+
                             },
                             onError = {
                                 errorMessage = it

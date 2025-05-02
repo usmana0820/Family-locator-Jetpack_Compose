@@ -16,8 +16,6 @@ import androidx.navigation.NavHostController
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-
-
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.Canvas
@@ -30,7 +28,9 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.ui.graphics.Path
 import androidx.compose.runtime.Composable
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import com.auth0.trackinapp.R
 import kotlinx.coroutines.delay
@@ -45,12 +45,16 @@ fun ForgotPasswordScreen(navController: NavHostController) {
 
     val blueishColor = colorResource(id = R.color.blueish)
 
-    // Smooth button animation
     val buttonOffset by animateDpAsState(
         targetValue = if (isVisible) 0.dp else 100.dp,
         animationSpec = tween(durationMillis = 800, easing = FastOutSlowInEasing),
         label = "Button Slide Animation"
     )
+
+    val context = LocalContext.current
+    val forgotPasswordText = stringResource(id = R.string.forgot_password_title)
+    val emailLabelText = stringResource(id = R.string.enter_email_label)
+    val sendResetLinkText = stringResource(id = R.string.send_reset_link)
 
     LaunchedEffect(Unit) {
         delay(300)
@@ -77,7 +81,7 @@ fun ForgotPasswordScreen(navController: NavHostController) {
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(16.dp)
-                    .offset(y = buttonOffset), // Smooth slide animation
+                    .offset(y = buttonOffset),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -86,7 +90,7 @@ fun ForgotPasswordScreen(navController: NavHostController) {
                     enter = fadeIn(animationSpec = tween(500)) + slideInVertically()
                 ) {
                     Text(
-                        text = "Forgot Password",
+                        text = forgotPasswordText,
                         style = MaterialTheme.typography.headlineLarge.copy(
                             color = blueishColor,
                             fontWeight = FontWeight.Bold
@@ -98,7 +102,7 @@ fun ForgotPasswordScreen(navController: NavHostController) {
                 TextField(
                     value = email,
                     onValueChange = { email = it },
-                    label = { Text("Enter your email") },
+                    label = { Text(emailLabelText) },
                     modifier = Modifier.fillMaxWidth(),
                     colors = TextFieldDefaults.textFieldColors(
                         containerColor = Color.Transparent,
@@ -120,21 +124,21 @@ fun ForgotPasswordScreen(navController: NavHostController) {
                             RetrofitService.api.forgotPassword(request).enqueue(object : Callback<Void> {
                                 override fun onResponse(call: Call<Void>, response: Response<Void>) {
                                     if (response.isSuccessful) {
-                                        successMessage = "Reset link sent to your email."
+                                        successMessage = context.getString(R.string.reset_link_success)
                                     } else {
-                                        errorMessage = "Failed to send reset link: ${response.message()}"
+                                        errorMessage = context.getString(R.string.reset_link_failed, response.message())
                                     }
                                 }
 
                                 override fun onFailure(call: Call<Void>, t: Throwable) {
-                                    errorMessage = "Error: ${t.localizedMessage}"
+                                    errorMessage = context.getString(R.string.reset_link_error, t.localizedMessage)
                                 }
                             })
                         },
                         modifier = Modifier.fillMaxWidth(),
                         colors = ButtonDefaults.buttonColors(containerColor = blueishColor)
                     ) {
-                        Text("Send Reset Link", color = Color.White)
+                        Text(sendResetLinkText, color = Color.White)
                     }
                 }
 
@@ -160,7 +164,6 @@ fun ResetPasswordScreen(navController: NavHostController, token: String) {
 
     val blueishColor = colorResource(id = R.color.blueish)
 
-    // Smooth button animation
     val buttonOffset by animateDpAsState(
         targetValue = if (isVisible) 0.dp else 100.dp,
         animationSpec = tween(durationMillis = 800, easing = FastOutSlowInEasing),
@@ -171,6 +174,8 @@ fun ResetPasswordScreen(navController: NavHostController, token: String) {
         delay(300)
         isVisible = true
     }
+
+    val context = LocalContext.current
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -192,7 +197,7 @@ fun ResetPasswordScreen(navController: NavHostController, token: String) {
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(16.dp)
-                    .offset(y = buttonOffset), // Smooth slide animation
+                    .offset(y = buttonOffset),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -201,7 +206,7 @@ fun ResetPasswordScreen(navController: NavHostController, token: String) {
                     enter = fadeIn(animationSpec = tween(500)) + slideInVertically()
                 ) {
                     Text(
-                        text = "Reset Password",
+                        text = stringResource(id = R.string.reset_password),
                         style = MaterialTheme.typography.headlineLarge.copy(
                             color = blueishColor,
                             fontWeight = FontWeight.Bold
@@ -213,7 +218,7 @@ fun ResetPasswordScreen(navController: NavHostController, token: String) {
                 TextField(
                     value = newPassword,
                     onValueChange = { newPassword = it },
-                    label = { Text("New Password") },
+                    label = { Text(stringResource(id = R.string.new_password)) },
                     visualTransformation = PasswordVisualTransformation(),
                     modifier = Modifier.fillMaxWidth(),
                     colors = TextFieldDefaults.textFieldColors(
@@ -229,7 +234,7 @@ fun ResetPasswordScreen(navController: NavHostController, token: String) {
                 TextField(
                     value = confirmPassword,
                     onValueChange = { confirmPassword = it },
-                    label = { Text("Confirm Password") },
+                    label = { Text(stringResource(id = R.string.confirm_password)) },
                     visualTransformation = PasswordVisualTransformation(),
                     modifier = Modifier.fillMaxWidth(),
                     colors = TextFieldDefaults.textFieldColors(
@@ -252,22 +257,22 @@ fun ResetPasswordScreen(navController: NavHostController, token: String) {
                             RetrofitService.api.resetPassword(token, request).enqueue(object : Callback<Void> {
                                 override fun onResponse(call: Call<Void>, response: Response<Void>) {
                                     if (response.isSuccessful) {
-                                        successMessage = "Password reset successfully!"
+                                        successMessage = context.getString(R.string.password_reset_success)
                                         navController.navigate("LoginScreen")
                                     } else {
-                                        errorMessage = "Failed to reset password: ${response.message()}"
+                                        errorMessage = context.getString(R.string.password_reset_failure, response.message())
                                     }
                                 }
 
                                 override fun onFailure(call: Call<Void>, t: Throwable) {
-                                    errorMessage = "Error: ${t.localizedMessage}"
+                                    errorMessage = context.getString(R.string.password_reset_error, t.localizedMessage ?: "")
                                 }
                             })
                         },
                         modifier = Modifier.fillMaxWidth(),
                         colors = ButtonDefaults.buttonColors(containerColor = blueishColor)
                     ) {
-                        Text("Reset Password", color = Color.White)
+                        Text(stringResource(id = R.string.reset_password_button), color = Color.White)
                     }
                 }
 
@@ -281,6 +286,7 @@ fun ResetPasswordScreen(navController: NavHostController, token: String) {
         }
     }
 }
+
 
 
 

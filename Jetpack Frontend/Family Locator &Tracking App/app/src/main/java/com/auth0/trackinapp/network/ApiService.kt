@@ -1,4 +1,5 @@
 // ApiService.kt
+import com.google.android.gms.common.api.Response
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.http.Body
@@ -24,6 +25,14 @@ data class LoginRequest(val email: String, val password: String)
 
 data class LoginResponse(val refresh: String, val access: String)
 
+
+data class UserInfoResponse(val id: Int,
+  val email: String,
+  val phoneNumber: String,
+  val isVerified: Boolean
+)
+
+
                                                     //GroupManagement
 // GroupRequest.kt
 data class CreateGroupRequest(val group_name: String, val max_members: Int)
@@ -32,58 +41,14 @@ data class CreateGroupResponse(val message: String, val group_id: Int, val group
 data class JoinGroupRequest(val pin: Int)
 data class JoinGroupResponse(val message: String, val group_id: Int, val group_name: String)
 
+data class Groupdetails(val id: Int, val group_name: String, val max_members: Int, val pin: Int, val created_by: String)
 
-data class EditGroupRequest(val group_name: String?, val max_members: Int?)
-data class EditGroupResponse(val message: String, val group_name: String, val max_members: Int)
-
-data class DeleteGroupResponse(val message: String)
-//data class LeaveGroupResponse(val message: String)
-
-
-// GroupDetailsResponse.kt
-data class GroupDetailsResponse(
-  val id: Int,
-  val group_name: String,
-  val max_members: Int,
-  val current_member_count: Int,
-  val members: List<GroupMember>
-)
-
-data class GroupMember(
-  val id: Int,
-  val user: String,
-  val user_name: String,
-  val user_email: String,
-  val role: String,
-  val joined_at: String
-)
-
-
-data class GroupDetails(
-  val id: Int,
-  val group_name: String,
-  val max_members: Int,
-  val current_member_count: Int,
-  val members: List<Member>
-)
-
-data class Member(
-  val id: Int,
-  val user: String,
-  val user_name: String,
-  val user_email: String,
-  val role: String,
-  val joined_at: String
-)
-
-// Leave Group Response Model
-data class LeaveGroupResponse(val status: String, val message: String)
-
-// Update Role Request Model
 data class UpdateRoleRequest(val role: String)
+data class GenericResponse(val message: String)
 
-// Update Role Response Model
-data class UpdateRoleResponse(val status: String, val message: String)
+
+
+
 
 interface ApiService {
                                                       //EndPoints
@@ -105,7 +70,6 @@ interface ApiService {
   fun resetPassword(@Path("token") token: String, @Body request: ResetPasswordRequest): Call<Void>
 
 
-
                                                   //GroupManagement
   // Create Group
   @POST("groups/create/")
@@ -115,29 +79,24 @@ interface ApiService {
   @POST("groups/join/")
   fun joinGroup(@Header("Authorization") token: String, @Body joinRequest: JoinGroupRequest): Call<JoinGroupResponse>
 
+  @GET("user_groupsdetail/")
+  suspend fun getUserGroupsDetails(@Header("Authorization") token: String): List<Groupdetails>  // Assuming the response is a list of groups
 
-  // Get Group Details
-  @GET("api/group_details/{group_id}/")
-  fun getGroupDetails(
-    @Path("group_id") groupId: Int,
-    @Header("Authorization") token: String
-  ): Call<GroupDetailsResponse>
 
   // Leave Group
   @POST("groups/leave/{group_id}/")
-  fun leaveGroup(
-    @Path("group_id") groupId: Int,
-    @Header("Authorization") token: String
-  ): Call<LeaveGroupResponse>
+  fun leaveGroup(@Header("Authorization") token: String, @Path("group_id") groupId: Int): Call<GenericResponse>
 
   // Update Member Role
-  @PATCH("groups/update_member_role/{group_id}/{member_id}/")
-  fun updateMemberRole(
-    @Path("group_id") groupId: Int,
-    @Path("member_id") memberId: Int,
-    @Header("Authorization") token: String,
-    @Body updateRoleRequest: UpdateRoleRequest
-  ): Call<UpdateRoleResponse>
+  @PATCH("groups/update-role/{group_id}/{member_id}/")
+  fun updateMemberRole(@Header("Authorization") token: String, @Path("group_id") groupId: Int, @Path("member_id") memberId: Int,
+                       @Body roleUpdate: UpdateRoleRequest
+  ): Call<GenericResponse>
+
+  // Delete Group
+  @DELETE("groups/delete/{group_id}/")
+  fun deleteGroup(@Header("Authorization") token: String, @Path("group_id") groupId: Int
+  ): Call<GenericResponse>
 
 
 

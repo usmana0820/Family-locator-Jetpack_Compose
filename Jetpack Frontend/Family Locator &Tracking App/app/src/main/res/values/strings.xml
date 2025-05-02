@@ -13,12 +13,70 @@
     <string name="welcome_app">Welcome to Family Locator &amp; Tracking App</string>
     <string name="lets_started">Lets Get Started</string>
 
+
+
     <!--              Language Screen             -->
     <string name="select_your_language">Select Your Language</string>
+
+    <!--              Register Screen             -->
+    <string name="register_title">Register</string>
+    <string name="email_label">Email</string>
+    <string name="password_label">Password</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="phone_number_label">Phone Number</string>
+    <string name="sign_up_button">Sign Up</string>
+    <string name="already_have_account">Already have an account? Login</string>
+    <string name="error_fields_required">All fields are required.</string>
+    <string name="error_password_mismatch">Passwords do not match.</string>
+    <string name="error_registration_failed">Registration failed: %1$s</string>
+    <string name="error_generic">Error: %1$s</string>
+
 
 
     <!--              Login Screen             -->
     <string name="continue_with_google">Sign in With Google</string>
+
+    <string name="login_title">Login</string>
+    <string name="login_button">Login</string>
+    <string name="invalid_email">Invalid email format</string>
+    <string name="password_too_short">Password must be at least 6 characters</string>
+    <string name="auth_failed">Authentication failed. Try again.</string>
+    <string name="register_prompt">Don\'t have an account? Register</string>
+    <string name="forgot_password">Forgot Password?</string>
+
+    <!--              Forgot Password            -->
+    <string name="forgot_password_title">Forgot Password</string>
+    <string name="enter_email_label">Enter your email</string>
+    <string name="send_reset_link">Send Reset Link</string>
+    <string name="reset_link_success">Reset link sent to your email.</string>
+    <string name="reset_link_failed">Failed to send reset link: %1$s</string>
+    <string name="reset_link_error">Error: %1$s</string>
+
+    <!--              Reset Password            -->
+    <string name="reset_password">Reset Password</string>
+    <string name="new_password">New Password</string>
+    <string name="reset_password_button">Reset Password</string>
+    <string name="password_reset_success">Password reset successfully!</string>
+    <string name="password_reset_failure">Failed to reset password: %1$s</string>
+    <string name="password_reset_error">Error: %1$s</string>
+
+    <!--              Email Verification           -->
+    <string name="email_verification_title">Email Verification</string>
+    <string name="enter_verification_token">Enter Verification Token</string>
+    <string name="verify_email_button">Verify Email</string>
+    <string name="verification_failed">Verification failed: %1$s</string>
+    <string name="error_occurred">Error: %1$s</string>
+
+    <!--              Create Screen             -->
+    <string name="group_creation_title">Create Group</string>
+    <string name="group_name_label">Group Name</string>
+    <string name="max_members_label">Max Members</string>
+    <string name="valid_number_error">Please enter a valid number</string>
+    <string name="create_group_button">Create Group</string>
+    <string name="group_created_success_message">Group created successfully</string>
+    <string name="copy_pin_button">Copy Pin</string>
+    <string name="pin_dialog_title">Group Pin Code</string>
+    <string name="ok_button">OK</string>
 
     <!--              Login Screen             -->
 <!--    <string name="continue_with_google">Sign in With Google</string>-->

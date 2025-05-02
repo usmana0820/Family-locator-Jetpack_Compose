@@ -1,5 +1,6 @@
 package com.auth0.trackinapp.screens
 
+import android.content.Context
 import android.graphics.fonts.FontStyle
 import android.os.Bundle
 import android.util.LayoutDirection
@@ -77,21 +78,46 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.Dp
-@Composable
-@Preview(showBackground = true)
-fun SplashActivityPreview() {
-    MaterialTheme {
-        SplashActivity(navController = rememberNavController())
-    }
-}
+import com.android.tools.build.jetifier.core.utils.Log
+import com.auth0.trackinapp.SharedPrefManager
+
+
 
 @Composable
-fun SplashActivity(navController: NavController) {
+fun SplashScreen(navController: NavController) {
+
+    val context = LocalContext.current
+    SharedPrefManager.init(context)
+    // Check if token is available and log it
+    val token = SharedPrefManager.getToken()
+    Log.e("SplashScreen", "Valid Token: $token")  // Print the token in log
+
+
+    LaunchedEffect(Unit) {
+        delay(1000)  // Simulate loading time
+
+        if (SharedPrefManager.isTokenAvailable()) {
+            // If token exists, navigate to home screen
+            // Pass the token to the home screen
+            val groupName = "Fmily Loctor" // Get the group name or any other relevant data
+            navController.navigate("home_screen/$groupName/$token")
+        } else {
+            // Otherwise, navigate to login screen
+            navController.navigate("LoginScreen")
+        }
+
+
+
+
+
+
+    }
     // Animation for fade-in effect on logo
     val logoAlpha by animateFloatAsState(
         targetValue = 1f,
         animationSpec = tween(durationMillis = 2000, easing = LinearEasing)
     )
+
 
     // Animation for button background scale effect
     val buttonScale by animateFloatAsState(
@@ -105,10 +131,13 @@ fun SplashActivity(navController: NavController) {
         animationSpec = tween(durationMillis = 1500, easing = FastOutSlowInEasing)
     )
 
-    LaunchedEffect(Unit) {
-        delay(3000) // Splash screen duration
-        navController.navigate("LoginScreen") // Navigate to login screen
-    }
+//    LaunchedEffect(Unit) {
+//        delay(3000) // Splash screen duration
+//        navController.navigate("LoginScreen") // Navigate to login screen
+//    }
+
+
+
 
     // Full-screen background with gradient
     Surface(
@@ -171,6 +200,12 @@ fun SplashActivity(navController: NavController) {
                         style = MaterialTheme.typography.bodyLarge.copy(color = Color.White),
                         fontWeight = FontWeight.Normal
                     )
+
+                    // Check if token is available and log it
+                    val token = SharedPrefManager.getToken()
+                    Log.d("SplashScreen", "Valid Token: $token")  // Print the token in log
+                    Log.e("SplashScreen", "Valid Token: $token")  // Print the token in log
+
                 }
             }
         }

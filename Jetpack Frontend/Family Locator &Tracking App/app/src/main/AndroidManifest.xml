@@ -9,6 +9,8 @@
     <application
         android:allowBackup="true"
         android:usesCleartextTraffic="true"
+        android:networkSecurityConfig="@xml/network_security_config"
+
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_app_logo"
@@ -39,33 +41,33 @@
             android:exported="true">
         </activity>
 
-        <activity
-            android:name=".auth.LoginScreen"
-            android:exported="true">
-        </activity>
+<!--        <activity-->
+<!--            android:name=".auth.LoginScreen"-->
+<!--            android:exported="true">-->
+<!--        </activity>-->
 
         <activity
             android:name=".screens.HomeScreen"
             android:exported="true">
         </activity>
 
-        <activity
-            android:name=".screens.GroupScreen"
-            android:exported="true">
-        </activity>
+<!--        <activity-->
+<!--            android:name=".screens.GroupScreen"-->
+<!--            android:exported="true">-->
+<!--        </activity>-->
 
-        <activity
-            android:name=".settings.SettingsActivity"
-            android:exported="true">
-        </activity>
-        <activity
-            android:name=".groupmanagement.CreateGroup"
-            android:exported="true">
-        </activity>
-        <activity
-            android:name=".groupmanagement.JoinGroup"
-            android:exported="true">
-        </activity>
+<!--        <activity-->
+<!--            android:name=".settings.SettingsActivity"-->
+<!--            android:exported="true">-->
+<!--        </activity>-->
+<!--        <activity-->
+<!--            android:name=".groupmanagement.CreateGroup"-->
+<!--            android:exported="true">-->
+<!--        </activity>-->
+<!--        <activity-->
+<!--            android:name=".groupmanagement.JoinGroup"-->
+<!--            android:exported="true">-->
+<!--        </activity>-->
 
 
         <meta-data
