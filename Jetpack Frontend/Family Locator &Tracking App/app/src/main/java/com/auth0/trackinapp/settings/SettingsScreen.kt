@@ -25,18 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import coil.compose.rememberImagePainter
-import com.auth0.trackinapp.R
-import com.auth0.trackinapp.ui.theme.TrackinAppTheme
-import com.google.firebase.auth.FirebaseAuth
-import java.time.format.TextStyle
-
-
 import androidx.compose.foundation.Canvas
-import androidx.compose.animation.*
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.ui.graphics.Path
 import androidx.compose.runtime.Composable
 import androidx.compose.material3.ButtonDefaults
@@ -44,6 +33,7 @@ import androidx.compose.material3.Text
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.nativeCanvas
+import com.auth0.trackinapp.SharedPrefManager
 
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -135,9 +125,14 @@ fun SettingsScreen(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
+
                 SettingOption(
                     text = "Logout",
-                    onClick = { /* Handle Logout click */ }
+                    onClick = { SharedPrefManager.clearToken()
+                        navController.navigate("LoginScreen") {
+                            popUpTo("LoginScreen") { inclusive = true }
+                        }
+                    }
                 )
             }
         }

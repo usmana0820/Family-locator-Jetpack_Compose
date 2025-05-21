@@ -22,6 +22,9 @@ import androidx.navigation.compose.rememberNavController
 import androidx.compose.animation.*
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.VerifiedUser
 import androidx.compose.ui.graphics.Path
 import androidx.compose.runtime.Composable
 import androidx.compose.material3.ButtonDefaults
@@ -83,7 +86,7 @@ fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel = v
                         textAlign = android.graphics.Paint.Align.CENTER
                         typeface = android.graphics.Typeface.create(android.graphics.Typeface.DEFAULT, android.graphics.Typeface.BOLD)
                     }
-                    drawText("Fmily Loctor", size.width / 2, size.height * 0.1f, textPaint)
+                    drawText("Family Locator", size.width / 2, size.height * 0.1f, textPaint)
 //                    drawText(stringResource(R.string.app_name), size.width / 2, size.height * 0.1f, textPaint)
                 }
             }
@@ -209,6 +212,17 @@ fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel = v
                                 )
                             }
                         }
+                        Button(
+                            onClick = {
+                                navController.navigate("subscription_screen")
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(66.dp)
+                        ) {
+                            Text(text = "Upgrade to Premium")
+                        }
+
                     }
 
                     Spacer(modifier = Modifier.height(16.dp))

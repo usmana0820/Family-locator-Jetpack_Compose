@@ -189,6 +189,7 @@ fun NavigationHost(fusedLocationClient: FusedLocationProviderClient) {
             SettingsScreen(navController = navController, token = token)
         }
 
+        composable("subscription_screen") { SubscriptionScreen(navController) }
 
 
 //        composable("home_screen/{groupName}/{username}") { backStackEntry ->

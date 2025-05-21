@@ -45,37 +45,15 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
-
-import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.auth0.trackinapp.R
-import com.auth0.trackinapp.auth.LoginScreen
-import com.auth0.trackinapp.ui.theme.TrackinAppTheme
 import kotlinx.coroutines.delay
-import kotlin.io.path.Path
-import kotlin.io.path.moveTo
 
-import androidx.compose.material3.*
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.geometry.Offset
-
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.Dp
 import com.android.tools.build.jetifier.core.utils.Log
@@ -99,7 +77,7 @@ fun SplashScreen(navController: NavController) {
         if (SharedPrefManager.isTokenAvailable()) {
             // If token exists, navigate to home screen
             // Pass the token to the home screen
-            val groupName = "Fmily Loctor" // Get the group name or any other relevant data
+            val groupName = "Group " // Get the group name or any other relevant data
             navController.navigate("home_screen/$groupName/$token")
         } else {
             // Otherwise, navigate to login screen

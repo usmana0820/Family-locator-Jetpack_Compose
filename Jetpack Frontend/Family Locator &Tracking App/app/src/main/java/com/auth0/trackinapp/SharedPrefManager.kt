@@ -6,6 +6,7 @@ object SharedPrefManager {
 
     private const val PREF_NAME = "user_pref"      // SharedPreferences file name for storing user data
     private const val USER_TOKEN = "USER_TOKEN"     // Key used to store the user token
+    private const val SUBSCRIPTION_STATUS = "SUBSCRIPTION_STATUS"
 
 
     private lateinit var sharedPreferences: SharedPreferences     // SharedPreferences instance
@@ -38,4 +39,13 @@ object SharedPrefManager {
         // Removing the token from SharedPreferences
         sharedPreferences.edit().remove(USER_TOKEN).apply()
     }
+
+    fun saveSubscriptionStatus(isActive: Boolean) {
+        sharedPreferences.edit().putBoolean(SUBSCRIPTION_STATUS, isActive).apply()
+    }
+
+    fun getSubscriptionStatus(): Boolean {
+        return sharedPreferences.getBoolean(SUBSCRIPTION_STATUS, false)
+    }
+
 }

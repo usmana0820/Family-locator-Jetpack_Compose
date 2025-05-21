@@ -4,7 +4,9 @@ import Groupdetails
 import android.os.Build
 import android.widget.Toast
 import androidx.annotation.RequiresApi
-import androidx.benchmark.perfetto.Row
+import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -39,6 +41,8 @@ import com.auth0.trackinapp.groupmanagement.GroupViewModel
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
@@ -46,36 +50,88 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.*
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import com.auth0.trackinapp.SharedPrefManager
-
-
-
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import com.auth0.trackinapp.R
 
 @Composable
-fun GroupSetting(navController: NavController, token: String, groupId: Int, viewModel: GroupViewModel = viewModel()) {
-    //  val groupName = remember { mutableStateOf(SharedPrefManager.getSelectedGroupName() ?: "No Group Selected") }
-    //  val groupId = remember { mutableStateOf(SharedPrefManager.getSelectedGroupId()) }
+fun WaveHeader() {
+    val blueishColor = Color(0xFF0098C3)
+    val lightBlue = Color(0xFFE0F7FA)
 
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(260.dp)
+            .background(
+                Brush.verticalGradient(
+                    colors = listOf(blueishColor, lightBlue)
+                )
+            )
+    ) {
+        Canvas(modifier = Modifier.fillMaxSize()) {
+            val path = Path().apply {
+                moveTo(0f, size.height * 0.75f)
+                cubicTo(
+                    size.width * 0.25f, size.height,
+                    size.width * 0.75f, size.height * 0.5f,
+                    size.width, size.height * 0.75f
+                )
+                lineTo(size.width, 0f)
+                lineTo(0f, 0f)
+                close()
+            }
+            drawPath(path = path, color = blueishColor)
+        }
 
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = 70.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "Group Management",
+                style = MaterialTheme.typography.headlineSmall.copy(
+                    color = Color.White,
+                    fontWeight = FontWeight.ExtraBold
+                )
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+
+        }
+    }
+}
+
+@Composable
+fun GroupSetting(navController: NavController, token: String, groupId: Int, viewModel: GroupViewModel = viewModel() ){
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = Color.White
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
+            WaveHeader()
+
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(16.dp),
+                    .padding(top = 260.dp, start = 16.dp, end = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(
-                    text = "Group Management",
-                    fontSize = 28.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFF0098c3)
-                )
+//                Text(
+//                    text = "Group Management",
+//                    fontSize = 28.sp,
+//                    fontWeight = FontWeight.Bold,
+//                    color = colorResource(id = R.color.blueish)
+//                )
                 Spacer(modifier = Modifier.height(16.dp))
 
                 // Group Details
@@ -87,117 +143,132 @@ fun GroupSetting(navController: NavController, token: String, groupId: Int, view
                         modifier = Modifier.padding(16.dp),
                         horizontalAlignment = Alignment.Start
                     ) {
-                        // Text(text = "Current Group: ${groupName.value}", fontSize = 18.sp)
-                        Spacer(modifier = Modifier.height(8.dp))
-                        // Text(text = "Group ID: ${groupId.value}", fontSize = 18.sp)
+                        // Add group details here
                     }
                 }
                 Spacer(modifier = Modifier.height(20.dp))
 
                 // Buttons for different actions
+                val buttonModifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 6.dp)
 
                 Button(
                     onClick = { navController.navigate("group_creation_screen/$token") },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0098c3))
+                    modifier = buttonModifier,
+                    colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.blueish))
                 ) {
                     Text("Create Group", color = Color.White, fontSize = 18.sp)
                 }
 
-                Spacer(modifier = Modifier.height(12.dp))
-
                 Button(
                     onClick = { navController.navigate("group_join_screen/$token") },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0098c3))
+                    modifier = buttonModifier,
+                    colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.blueish))
                 ) {
                     Text("Join Group", color = Color.White, fontSize = 18.sp)
                 }
 
-                Spacer(modifier = Modifier.height(12.dp))
-
                 Button(
                     onClick = { navController.navigate("edit_group_screen") },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0098c3))
+                    modifier = buttonModifier,
+                    colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.blueish))
                 ) {
                     Text("Edit Group", color = Color.White, fontSize = 18.sp)
                 }
 
-                Spacer(modifier = Modifier.height(12.dp))
-
-
                 Button(
                     onClick = { navController.navigate("All_Group_Details") },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0098c3))
+                    modifier = buttonModifier,
+                    colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.blueish))
                 ) {
-                    Text("Switch Groups", color = Color.White, fontSize = 18.sp)
+                    Text("Group details", color = Color.White, fontSize = 18.sp)
                 }
-
-                Spacer(modifier = Modifier.height(12.dp))
 
                 Button(
-                    onClick = { navController.navigate("manage_members_screen") },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0098c3))
+                    onClick = { navController.navigate("switch_groups_screen") },
+                    modifier = buttonModifier,
+                    colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.blueish))
                 ) {
-                    Text("Manage Members", color = Color.White, fontSize = 18.sp)
+                    Text("Switch group", color = Color.White, fontSize = 18.sp)
                 }
-
-
-                Spacer(modifier = Modifier.height(12.dp))
 
                 Button(
                     onClick = { navController.navigate("leave_group_screen/$token/$groupId") },
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = buttonModifier,
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Gray)
                 ) {
                     Text("Leave Group", color = Color.White, fontSize = 18.sp)
                 }
 
-                Spacer(modifier = Modifier.height(12.dp))
-
                 Button(
                     onClick = { navController.navigate("delete_group_screen/$token/$groupId") },
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = buttonModifier,
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
                 ) {
                     Text("Delete Group", color = Color.White, fontSize = 18.sp)
                 }
-
-
-
             }
         }
     }
 }
+
 @Composable
 @RequiresApi(Build.VERSION_CODES.O)
 fun All_Group_Details(navController: NavController) {
-    // Retrieve the token from SharedPreferences
     val token = SharedPrefManager.getToken()
-    val groupViewModel = GroupViewModel()
+    val groupViewModel = remember { GroupViewModel() }
 
-    // Check if the token exists
-    if (token != null) {
-        // Fetch the groups' details using the token from SharedPreferences
-        groupViewModel.fetchGroupDetails(token)
-    } else {
-        // If the token does not exist, show an error message or navigate to login
-        Text(text = "User not logged in. Please login first.")
-    }
-
-    // Observe the group details in the view model
+    // Observe the group details from the ViewModel
     val groupDetails by groupViewModel.groupDetails.observeAsState(emptyList())
 
-    // UI displaying the fetched group details
-    if (groupDetails.isEmpty()) {
-        CircularProgressIndicator() // Show loading indicator if no data yet
-    } else {
-        LazyColumn {
-            items(groupDetails) { group ->
-                GroupItem(group = group, navController = navController)
+    // Fetch group details if token is available
+    LaunchedEffect(token) {
+        token?.let {
+            groupViewModel.fetchGroupDetails(it)
+        }
+    }
+
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = Color.White
+    ) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            // WaveHeader at the top
+            WaveHeader()
+
+            // Content below the header
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = 16.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                when {
+                    token == null -> {
+                        Text(
+                            text = "User not logged in. Please login first.",
+                            color = Color.Black,
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
+                    groupDetails.isEmpty() -> {
+                        CircularProgressIndicator(
+                            color = colorResource(id = R.color.blueish)
+                        )
+                    }
+                    else -> {
+                        LazyColumn(
+                            modifier = Modifier.fillMaxSize(),
+                            contentPadding = PaddingValues(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            items(groupDetails, key = { it.id }) { group ->
+                                GroupItem(group = group, navController = navController)
+                            }
+                        }
+                    }
+                }
             }
         }
     }
@@ -207,83 +278,133 @@ fun All_Group_Details(navController: NavController) {
 fun GroupItem(group: Groupdetails, navController: NavController) {
     Card(
         modifier = Modifier
-            .padding(8.dp)
             .fillMaxWidth()
+            .padding(top = 16.dp, start = 16.dp, end = 16.dp)
             .clickable {
-                //SharedPrefManager.saveSelectedGroup(group.id, group.group_name)
-                navController.navigate("GroupManagementSetting/{token}") // Navigate to GroupSetting
-            },     //   elevation = 4.dp
+                navController.navigate("GroupManagementSetting/${group.id}")
+            },
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 4.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF0098C3)) // Using the bluish theme color
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text(text = "Group id: ${group.id}", style = MaterialTheme.typography.headlineSmall)
-            Text(text = "Group Name: ${group.group_name}", style = MaterialTheme.typography.headlineSmall)
+            Text("Group ID: ${group.id}", style = MaterialTheme.typography.bodyMedium, color = Color.White)
+            Text("Group Name: ${group.group_name}", style = MaterialTheme.typography.headlineSmall, color = Color.White)
             Spacer(modifier = Modifier.height(8.dp))
-            Text(text = "Max Members: ${group.max_members}", style = MaterialTheme.typography.bodyLarge)
-            Text(text = "PIN: ${group.pin}", style = MaterialTheme.typography.bodyLarge)
-            Text(text = "Created By: ${group.created_by}", style = MaterialTheme.typography.bodyLarge)
+            Text("Max Members: ${group.max_members}", style = MaterialTheme.typography.bodyMedium, color = Color.White)
+            Text("PIN: ${group.pin}", style = MaterialTheme.typography.bodyMedium, color = Color.White)
+            Text("Created By: ${group.created_by}", style = MaterialTheme.typography.bodyMedium, color = Color.White)
         }
     }
 }
 
-
-//1️⃣ Edit Group Screen
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditGroupScreen(navController: NavController) {
     var groupName by remember { mutableStateOf("") }
     var maxMembers by remember { mutableStateOf("") }
+    val focusRequester = remember { FocusRequester() }
 
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = Color.White
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text("Edit Group", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Color(0xFF0098c3))
-            Spacer(modifier = Modifier.height(16.dp))
+        Box(modifier = Modifier.fillMaxSize()) {
+            // Wave header at the top
+            WaveHeader()
 
-            OutlinedTextField(
-                value = groupName,
-                onValueChange = { groupName = it },
-                label = { Text("Group Name") },
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            OutlinedTextField(
-                value = maxMembers,
-                onValueChange = { maxMembers = it },
-                label = { Text("Max Members") },
-                modifier = Modifier.fillMaxWidth(),
-             //   keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Button(
-                onClick = { /* Save Changes */ },
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0098c3))
+            // Form fields below the header
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = 260.dp, start = 16.dp, end = 16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text("Save Changes", color = Color.White)
-            }
+                Text(
+                    text = "Edit Group",
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = colorResource(id = R.color.blueish)
+                )
+                Spacer(modifier = Modifier.height(16.dp))
 
-            Spacer(modifier = Modifier.height(12.dp))
+                OutlinedTextField(
+                    value = groupName,
+                    onValueChange = { groupName = it },
+                    label = { Text("Group Name") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .focusRequester(focusRequester)
+                        .animateContentSize(),
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        focusedLabelColor = colorResource(id = R.color.blueish),
+                        focusedBorderColor = colorResource(id = R.color.blueish),
+                        unfocusedBorderColor = Color.Gray,
+                        cursorColor = colorResource(id = R.color.blueish),
+                    ),
+                    textStyle = LocalTextStyle.current.copy(color = Color.Black),
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        imeAction = ImeAction.Next
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onNext = {
+                            focusRequester.requestFocus()
+                        }
+                    )
+                )
 
-            Button(
-                onClick = { navController.popBackStack() },
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Gray)
-            ) {
-                Text("Cancel", color = Color.White)
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                OutlinedTextField(
+                    value = maxMembers,
+                    onValueChange = { maxMembers = it },
+                    label = { Text("Max Members") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .animateContentSize(),
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        focusedLabelColor = colorResource(id = R.color.blueish),
+                        focusedBorderColor = colorResource(id = R.color.blueish),
+                        unfocusedBorderColor = Color.Gray,
+                        cursorColor = colorResource(id = R.color.blueish),
+                    ),
+                    textStyle = LocalTextStyle.current.copy(color = Color.Black),
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Done
+                    )
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Button(
+                    onClick = { /* Save Changes */ },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = colorResource(id = R.color.blueish)
+                    )
+                ) {
+                    Text("Save Changes", color = Color.White)
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Button(
+                    onClick = { navController.popBackStack() },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Gray
+                    )
+                ) {
+                    Text("Cancel", color = Color.White)
+                }
             }
         }
     }
 }
+
+
 
 //2️⃣ Remove Group Confirmation
 @Composable
@@ -295,7 +416,7 @@ fun RemoveGroupScreen(navController: NavController) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp),
+                .padding(top = 260.dp, start = 16.dp, end = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text("Delete Group", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Color.Red)
@@ -327,6 +448,7 @@ fun RemoveGroupScreen(navController: NavController) {
 // 3️⃣ Manage Members Screen
 @Composable
 fun ManageMembersScreen(navController: NavController) {
+    WaveHeader()
     val members = listOf("User1", "User2", "User3", "Admin1")  // Dummy list
 
     Surface(
@@ -339,7 +461,7 @@ fun ManageMembersScreen(navController: NavController) {
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("Manage Members", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Color(0xFF0098c3))
+            Text("Manage Members", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = colorResource(id = R.color.blueish))
             Spacer(modifier = Modifier.height(16.dp))
 
             LazyColumn {
@@ -399,7 +521,7 @@ fun SwitchGroupsScreen(navController: NavController) {
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("Switch Groups", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Color(0xFF0098c3))
+            Text("Switch Groups", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = colorResource(id = R.color.blueish))
             Spacer(modifier = Modifier.height(16.dp))
 
             LazyColumn {

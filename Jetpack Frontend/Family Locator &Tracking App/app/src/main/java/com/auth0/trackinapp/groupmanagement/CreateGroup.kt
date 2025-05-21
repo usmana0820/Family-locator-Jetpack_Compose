@@ -2,6 +2,7 @@
 
 package com.auth0.trackinapp.groupmanagement
 
+import android.content.ClipData
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -30,10 +31,62 @@ import com.auth0.trackinapp.R
 import android.content.ClipboardManager
 import android.content.Context
 import android.util.Log
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.core.content.ContextCompat.getSystemService
 import com.auth0.trackinapp.SharedPrefManager
 
 @OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun WaveHeader1(modifier: Modifier = Modifier, color: Color) {
+    val blueishColor = Color(0xFF0098C3)
+    val lightBlue = Color(0xFFE0F7FA)
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(260.dp)
+            .background(
+                Brush.verticalGradient(
+                    colors = listOf(blueishColor, lightBlue)
+                )
+            )
+    ) {
+        Canvas(modifier = Modifier.fillMaxSize()) {
+            val path = Path().apply {
+                moveTo(0f, size.height * 0.75f)
+                cubicTo(
+                    size.width * 0.25f, size.height,
+                    size.width * 0.75f, size.height * 0.5f,
+                    size.width, size.height * 0.75f
+                )
+                lineTo(size.width, 0f)
+                lineTo(0f, 0f)
+                close()
+            }
+            drawPath(path = path, color = blueishColor)
+        }
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = 70.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "Group Management",
+                style = MaterialTheme.typography.headlineSmall.copy(
+                    color = Color.White,
+                    fontWeight = FontWeight.ExtraBold
+                )
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+
+        }
+    }
+}
+
 @Composable
 fun GroupCreationScreen(navController: NavController, token: String, groupViewModel: GroupViewModel = viewModel()) {
     var groupName by remember { mutableStateOf(TextFieldValue("")) }
@@ -49,15 +102,11 @@ fun GroupCreationScreen(navController: NavController, token: String, groupViewMo
 
     val blueishColor = colorResource(id = R.color.blueish)
 
-    // Function to check if input is a valid number
-    fun isValidNumber(value: String): Boolean {
-        return value.all { it.isDigit() }
-    }
+    fun isValidNumber(value: String): Boolean = value.all { it.isDigit() }
 
-    // Function to copy text to clipboard
     fun copyToClipboard(context: Context, text: String) {
         val clipboard = getSystemService(context, ClipboardManager::class.java)
-        val clip = android.content.ClipData.newPlainText("Generated Pin", text)
+        val clip = ClipData.newPlainText("Generated Pin", text)
         clipboard?.setPrimaryClip(clip)
     }
 
@@ -66,23 +115,12 @@ fun GroupCreationScreen(navController: NavController, token: String, groupViewMo
         color = colorResource(id = R.color.white)
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
-            Canvas(modifier = Modifier.fillMaxSize()) {
-                val path = Path().apply {
-                    moveTo(0f, 0f)
-                    lineTo(0f, size.height * 0.3f)
-                    cubicTo(
-                        size.width / 1,
-                        size.height * 0.1f,
-                        size.width,
-                        size.height * 0.3f,
-                        size.width,
-                        0f
-                    )
-                    lineTo(size.width, 0f)
-                    close()
-                }
-                drawPath(path = path, color = blueishColor)
-            }
+
+            // 🌊 Wave Header
+            WaveHeader1(
+                modifier = Modifier.fillMaxSize(),
+                color = blueishColor
+            )
 
             Column(
                 modifier = Modifier
@@ -98,18 +136,17 @@ fun GroupCreationScreen(navController: NavController, token: String, groupViewMo
                         fontWeight = FontWeight.Bold
                     )
                 )
-                Log.d("GroupCreationScreen", "Token: $token")
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Group Name TextField
+                // Group Name Field
                 TextField(
                     value = groupName,
                     onValueChange = { groupName = it },
-                    label = { Text("Group Name") },
+                    label = { Text("Group Name", color = Color.Black) },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clip(RoundedCornerShape(8.dp)), // Rounded corners
+                        .clip(RoundedCornerShape(8.dp)),
                     colors = TextFieldDefaults.textFieldColors(
                         containerColor = Color.Transparent,
                         focusedIndicatorColor = blueishColor,
@@ -117,9 +154,10 @@ fun GroupCreationScreen(navController: NavController, token: String, groupViewMo
                     ),
                     textStyle = TextStyle(color = Color.Black)
                 )
+
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Max Members TextField with Validation
+                // Max Members Field with Numeric Keyboard
                 TextField(
                     value = maxMembers,
                     onValueChange = {
@@ -130,10 +168,11 @@ fun GroupCreationScreen(navController: NavController, token: String, groupViewMo
                             isMaxMembersValid = false
                         }
                     },
-                    label = { Text("Max Members") },
+                    label = { Text("Max Members", color = Color.Black) },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clip(RoundedCornerShape(8.dp)), // Rounded corners
+                        .clip(RoundedCornerShape(8.dp)),
                     colors = TextFieldDefaults.textFieldColors(
                         containerColor = Color.Transparent,
                         focusedIndicatorColor = blueishColor,
@@ -141,7 +180,7 @@ fun GroupCreationScreen(navController: NavController, token: String, groupViewMo
                     ),
                     textStyle = TextStyle(color = Color.Black)
                 )
-                // Error message for invalid input
+
                 if (!isMaxMembersValid) {
                     Text(
                         text = "Please enter a valid number",
@@ -149,9 +188,10 @@ fun GroupCreationScreen(navController: NavController, token: String, groupViewMo
                         modifier = Modifier.padding(top = 8.dp)
                     )
                 }
+
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Create Group Button with Smooth Animation
+                // Create Group Button
                 Button(
                     onClick = {
                         if (isMaxMembersValid) {
@@ -160,12 +200,10 @@ fun GroupCreationScreen(navController: NavController, token: String, groupViewMo
                                 groupName.text,
                                 maxMembers.text.toInt(),
                                 onSuccess = { group ->
-                                    generatedPin = group.pin.toString() // Assuming 'group' contains the generated pin
+                                    generatedPin = group.pin.toString()
                                     successMessage = "Group created successfully"
                                     showDialog = true
-                                    // Save token after creating group
                                     SharedPrefManager.saveToken(token)
-                                    // Navigate to Home screen
                                     navController.navigate("home_screen/${group.group_name}/$token")
                                 },
                                 onError = {
@@ -176,14 +214,12 @@ fun GroupCreationScreen(navController: NavController, token: String, groupViewMo
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clip(RoundedCornerShape(12.dp)) // Rounded button
-                        .background(blueishColor), // Custom button color
+                        .clip(RoundedCornerShape(12.dp)),
                     colors = ButtonDefaults.buttonColors(containerColor = blueishColor)
                 ) {
                     Text("Create Group", color = Color.White)
                 }
 
-                // Success Message
                 if (successMessage.isNotEmpty()) {
                     Text(
                         text = successMessage,
@@ -192,7 +228,6 @@ fun GroupCreationScreen(navController: NavController, token: String, groupViewMo
                     )
                 }
 
-                // Error Message
                 if (errorMessage.isNotEmpty()) {
                     Text(
                         text = errorMessage,
@@ -202,66 +237,58 @@ fun GroupCreationScreen(navController: NavController, token: String, groupViewMo
                 }
             }
 
-            // Dialog for the generated pin
+            // PIN Dialog
             if (showDialog) {
-            AlertDialog(
-                onDismissRequest = { showDialog = false },
-                title = { Text("Group Pin Code", color = Color.Black) },
-                text = {
-                    Column {
-                        // Pin TextField
-                        TextField(
-                            value = generatedPin,
-                            onValueChange = {},
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clip(RoundedCornerShape(8.dp))
-                                .background(Color.Gray),
-                            colors = TextFieldDefaults.textFieldColors(
-                                containerColor = Color.Gray,
-                                focusedIndicatorColor = Color.Transparent,
-                                unfocusedIndicatorColor = Color.Transparent
-                            ),
-                            textStyle = TextStyle(color = Color.Black),
-                            enabled = false
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        // Copy Button
+                AlertDialog(
+                    onDismissRequest = { showDialog = false },
+                    title = { Text("Group Pin Code", color = Color.Black) },
+                    text = {
+                        Column {
+                            TextField(
+                                value = generatedPin,
+                                onValueChange = {},
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .background(Color.Gray),
+                                colors = TextFieldDefaults.textFieldColors(
+                                    containerColor = Color.Gray,
+                                    focusedIndicatorColor = Color.Transparent,
+                                    unfocusedIndicatorColor = Color.Transparent
+                                ),
+                                textStyle = TextStyle(color = Color.Black),
+                                enabled = false
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Button(
+                                onClick = {
+                                    copyToClipboard(context, generatedPin)
+                                    Toast.makeText(context, "PIN copied!", Toast.LENGTH_SHORT).show()
+                                },
+                                colors = ButtonDefaults.buttonColors(containerColor = blueishColor)
+                            ) {
+                                Text("Copy Pin", color = Color.White)
+                            }
+                        }
+                    },
+                    confirmButton = {
                         Button(
                             onClick = {
-                                copyToClipboard(context, text = generatedPin)
-                                Toast.makeText(context, "PIN copied!", Toast.LENGTH_SHORT).show()
+                                showDialog = false
+                                navController.navigate("home_screen/{groupName}/{token}")
                             },
                             colors = ButtonDefaults.buttonColors(containerColor = blueishColor)
                         ) {
-                            Text("Copy Pin", color = Color.White)
+                            Text("OK", color = Color.White)
                         }
-                    }
-                },
-                confirmButton = {
-                    Button(
-                        onClick = {
-                            showDialog = false
-                            navController.navigate("home_screen/{groupName}/{token}")
-                        },
-                        colors = ButtonDefaults.buttonColors(containerColor = blueishColor)
-                    ) {
-                        Text("OK", color = Color.White)
-                    }
-                },
-                containerColor = Color.White, // Correct property for background
-                modifier = Modifier.clip(RoundedCornerShape(12.dp))
-            )
+                    },
+                    containerColor = Color.White,
+                    modifier = Modifier.clip(RoundedCornerShape(12.dp))
+                )
             }
         }
     }
 }
-
-
-
-
-
 
 
 

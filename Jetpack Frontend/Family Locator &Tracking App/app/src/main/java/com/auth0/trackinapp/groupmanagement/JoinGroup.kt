@@ -27,23 +27,77 @@ import androidx.compose.runtime.Composable
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.VisualTransformation
 import com.auth0.trackinapp.R
 import com.auth0.trackinapp.SharedPrefManager
 import kotlinx.coroutines.delay
+
+@Composable
+fun WaveHeader2() {
+    val blueishColor = Color(0xFF0098C3)
+    val lightBlue = Color(0xFFE0F7FA)
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(260.dp)
+            .background(
+                Brush.verticalGradient(
+                    colors = listOf(blueishColor, lightBlue)
+                )
+            )
+    ) {
+        Canvas(modifier = Modifier.fillMaxSize()) {
+            val path = Path().apply {
+                moveTo(0f, size.height * 0.75f)
+                cubicTo(
+                    size.width * 0.25f, size.height,
+                    size.width * 0.75f, size.height * 0.5f,
+                    size.width, size.height * 0.75f
+                )
+                lineTo(size.width, 0f)
+                lineTo(0f, 0f)
+                close()
+            }
+            drawPath(path = path, color = blueishColor)
+        }
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = 70.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "Group Management",
+                style = MaterialTheme.typography.headlineSmall.copy(
+                    color = Color.White,
+                    fontWeight = FontWeight.ExtraBold
+                )
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+
+        }
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun GroupJoinScreen(navController: NavController, token: String, groupViewModel: GroupViewModel = viewModel()) {
+fun GroupJoinScreen(
+    navController: NavController,
+    token: String,
+    groupViewModel: GroupViewModel = viewModel()
+) {
     var pin by remember { mutableStateOf(TextFieldValue("")) }
     var successMessage by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
 
-
     val context = LocalContext.current
     SharedPrefManager.init(context)
-    
+
     val blueishColor = colorResource(id = R.color.blueish)
 
     Surface(
@@ -51,23 +105,9 @@ fun GroupJoinScreen(navController: NavController, token: String, groupViewModel:
         color = colorResource(id = R.color.white)
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
-            Canvas(modifier = Modifier.fillMaxSize()) {
-                val path = Path().apply {
-                    moveTo(0f, 0f)
-                    lineTo(0f, size.height * 0.3f)
-                    cubicTo(
-                        size.width / 1,
-                        size.height * 0.1f,
-                        size.width,
-                        size.height * 0.3f,
-                        size.width,
-                        0f
-                    )
-                    lineTo(size.width, 0f)
-                    close()
-                }
-                drawPath(path = path, color = blueishColor)
-            }
+
+            // 🌊 Call the reusable wave header
+            WaveHeader2()
 
             Column(
                 modifier = Modifier
@@ -83,45 +123,53 @@ fun GroupJoinScreen(navController: NavController, token: String, groupViewModel:
                         fontWeight = FontWeight.Bold
                     )
                 )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // PIN TextField (with numeric keyboard and black text)
                 TextField(
                     value = pin,
                     onValueChange = { pin = it },
-                    label = { Text("Group PIN") },
-                    modifier = Modifier.fillMaxWidth()
-                        .clip(RoundedCornerShape(8.dp)), // Rounded corners for text field
+                    label = { Text("Group PIN", color = Color.Black) },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(8.dp)),
                     colors = TextFieldDefaults.textFieldColors(
                         containerColor = Color.Transparent,
                         focusedIndicatorColor = blueishColor,
                         unfocusedIndicatorColor = colorResource(id = R.color.light_sea_green)
-                    )
+                    ),
+                    textStyle = TextStyle(color = Color.Black)
                 )
+
                 Spacer(modifier = Modifier.height(16.dp))
 
-
+                // Join Group Button
                 Button(
                     onClick = {
-                        groupViewModel.joinGroup(token, pin.text.toInt(),
-                            onSuccess = {
-                                group ->
-                                successMessage = "Joined group: ${group.group_name}" // Adjusted to use group_name
-                                navController.navigate("home_screen/${group.group_name}/$token") // Pass group name
-                                // Save token after joining the group
+                        groupViewModel.joinGroup(
+                            token,
+                            pin.text.toIntOrNull() ?: 0,
+                            onSuccess = { group ->
+                                successMessage = "Joined group: ${group.group_name}"
                                 SharedPrefManager.saveToken(token)
-
+                                navController.navigate("home_screen/${group.group_name}/$token")
                             },
-                            onError = {
-                                errorMessage = it
+                            onError = { error ->
+                                errorMessage = error
                             }
                         )
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(blueishColor) // Custom button color
+                        .clip(RoundedCornerShape(12.dp)),
+                    colors = ButtonDefaults.buttonColors(containerColor = blueishColor)
                 ) {
                     Text("Join Group", color = Color.White)
                 }
 
+                // Success and Error Messages
                 if (successMessage.isNotEmpty()) {
                     Text(
                         text = successMessage,
