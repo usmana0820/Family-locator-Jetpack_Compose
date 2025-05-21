@@ -14,10 +14,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 environ.Env.read_env(BASE_DIR / ".env")
 
 # Get FRONTEND_URL from environment variables
-FRONTEND_URL = env("FRONTEND_URL", default="http://localhost:8000")  # Default if not found
+FRONTEND_URL='http://192.168.10.13:8000'
 
 # Correct ALLOWED_HOSTS configuration after FRONTEND_URL is defined
-ALLOWED_HOSTS = ['localhost', '127.0.0.1',  '0.0.0.0','192.168.10.14','192.168.10.35']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1',  '0.0.0.0','192.168.10.7','192.168.10.22','192.168.10.13']
 
 # Other settings...
 CORS_ALLOW_CREDENTIALS = True
@@ -64,11 +64,6 @@ MIDDLEWARE = [
     'allauth.account.middleware.AccountMiddleware',
 
 ]
-
-# AUTHENTICATION_BACKENDS = [
-#     'authapp.backends.EmailBackend',  # Adjust the path accordingly
-#     'django.contrib.auth.backends.ModelBackend',  # Default backend
-# ]
 
 PASSWORD_HASHERS = [
     'django.contrib.auth.hashers.PBKDF2PasswordHasher',  # Default hasher
@@ -194,8 +189,8 @@ EMAIL_HOST_USER = env("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")
 
 SIMPLE_JWT = {
-   'ACCESS_TOKEN_LIFETIME': timedelta(minutes=90),
-   'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+   'ACCESS_TOKEN_LIFETIME': timedelta(days=365),
+   'REFRESH_TOKEN_LIFETIME': timedelta(days=365),
 }
 
 

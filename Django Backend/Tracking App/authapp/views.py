@@ -35,6 +35,22 @@ from django.utils.crypto import get_random_string
 import logging
 
 
+
+
+from django.contrib.auth.models import User
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework import status
+from .models import Group
+from django.shortcuts import get_object_or_404
+from django.contrib.auth import get_user_model
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
+from .models import Group, GroupMember
+from .serializers import GroupSerializer
+
+
                     # <!----------------- Authentication ---------------------->
 
 class RegisterView(APIView):
@@ -197,8 +213,19 @@ class ResetPasswordView(APIView):
             logger.error(f"Error during password reset: {e}")
             return render(request, 'reset_password.html', {'error': 'An unexpected error occurred.'})
 
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from .serializers import UserSerializer
 
+class UserInfoView(APIView):
+    permission_classes = [IsAuthenticated]  # Ensure the user is authenticated
 
+    def get(self, request):
+        # Get the authenticated user
+        user = request.user
+        serializer = UserSerializer(user)
+        return Response(serializer.data)
 
                     # <!----------------- GROUP MANAGEMENT ---------------------->
 from rest_framework.decorators import api_view, permission_classes
@@ -207,15 +234,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from .models import Group, GroupMember
 from .serializers import GroupSerializer, GroupJoinSerializer, GroupDetailSerializer
-
 from random import randint
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
-from rest_framework import status
-from random import randint
-from .models import Group, GroupMember
-from .serializers import GroupSerializer
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])  # Ensure only authenticated users can create a group
@@ -237,19 +256,10 @@ def create_group(request):
                 break
 
         # Create the group
-        group = Group.objects.create(
-            group_name=group_name,
-            max_members=max_members,
-            pin=pin,
-            created_by=user,
-        )
+        group = Group.objects.create( group_name=group_name, max_members=max_members,pin=pin,created_by=user, )
 
         # Add the user as the admin in the GroupMember model
-        GroupMember.objects.create(
-            group=group,
-            user=user,
-            role='admin'
-        )
+        GroupMember.objects.create( group=group, user=user, role='admin' )
 
         # Return response with all group details
         return Response({
@@ -302,56 +312,36 @@ def join_group(request):
         group_member = GroupMember.objects.create(group=group, user=user, role='member')
 
 
-        return Response({
-            "message": "You have joined the group successfully.",
+        return Response({  "message": "You have joined the group successfully.",
             "group_id": group.id,
             "group_name": group.group_name,
         }, status=status.HTTP_200_OK)
     
-        # return Response({
-        #     "message": "You have successfully joined the group.",
-        #     "group_id": group.id,
-        #     "group_name": group.group_name,
-        #     "member_id": group_member.id,
-        #     "user_email": user.email,
-        #     "role": group_member.role
-        # }, status=status.HTTP_200_OK)
 
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def list_groups(request):
-    """
-    Lists all groups.
-    """
-    groups = Group.objects.all()
-    serializer = GroupSerializer(groups, many=True)
-    return Response(serializer.data, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def group_details(request, group_id):
-    """
-    Retrieves the details of a specific group, including members.
-    """
-    # Fetch the group or return 404 if not found
-    group = get_object_or_404(Group, id=group_id)
+def user_groupsdetail(request):
+    try:
+        # Fetch the custom user model using get_user_model()
+        User = get_user_model()
 
-    # Serialize the group data with members and current member count
-    serializer = GroupDetailSerializer(group, context={"request": request})
+        # Get the currently logged-in user
+        user = User.objects.get(email=request.user.email)
 
-    # Prepare the response data in the desired format
-    response_data = {
-        "status": "success",
-        "message": "Group details fetched successfully",
-        "data": serializer.data
-    }
+        # Get the GroupMembers for the user and filter groups
+        group_memberships = GroupMember.objects.filter(user=user)
+        groups = [membership.group for membership in group_memberships]  # List of groups for the user
 
-    return Response(response_data, status=status.HTTP_200_OK)
-
-
+        # Serialize the groups
+        serializer = GroupSerializer(groups, many=True)
+        return Response(serializer.data)
+    except User.DoesNotExist:
+        return Response({"error": "User not found"}, status=400)
+    except Exception as e:
+        return Response({"error": str(e)}, status=500)
 
 
 @api_view(['POST'])
